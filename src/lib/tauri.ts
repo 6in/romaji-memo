@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 
-// Types for Tauri IPC responses
+// --- Types ---
+
 export interface ConvertResult {
   converted: string;
   intent: string;
@@ -8,21 +9,23 @@ export interface ConvertResult {
   historyId: number;
 }
 
+export interface ConversionRecord {
+  id: number;
+  input: string;
+  output: string;
+  styleId: string;
+  intent: string | null;
+  typo: string | null;
+  providerId: string;
+  model: string;
+  pinned: boolean;
+  createdAt: string;
+}
+
 export interface ProviderInfo {
   id: string;
   name: string;
   providerType: string;
-}
-
-export interface HistoryRecord {
-  id: number;
-  input: string;
-  converted: string;
-  intent: string;
-  typo: string;
-  styleId: string;
-  providerId: string;
-  createdAt: string;
 }
 
 export interface WindowState {
@@ -32,35 +35,43 @@ export interface WindowState {
   height: number;
 }
 
-// Typed invoke wrappers
+// --- Commands ---
+
 export async function convertText(
   input: string,
   styleId: string,
   providerId: string,
 ): Promise<ConvertResult> {
-  return invoke<ConvertResult>('convert_text', { input, styleId, providerId });
+  return invoke<ConvertResult>('convert', { input, styleId, providerId });
+}
+
+export async function getHistory(
+  limit: number,
+  offset: number,
+  styleFilter?: string,
+): Promise<ConversionRecord[]> {
+  return invoke<ConversionRecord[]>('get_history', { limit, offset, styleFilter });
 }
 
 export async function listProviders(): Promise<ProviderInfo[]> {
   return invoke<ProviderInfo[]>('list_providers');
 }
 
-export async function getHistory(
-  limit?: number,
-  offset?: number,
-  styleFilter?: string,
-): Promise<HistoryRecord[]> {
-  return invoke<HistoryRecord[]>('get_history', { limit, offset, styleFilter });
-}
-
 export async function toggleAlwaysOnTop(): Promise<boolean> {
   return invoke<boolean>('toggle_always_on_top');
 }
 
-export async function saveWindowState(state: WindowState): Promise<void> {
-  return invoke<void>('save_window_state', { state });
+export async function saveWindowState(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): Promise<void> {
+  return invoke('save_window_state', { x, y, width, height });
 }
 
 export async function getWindowState(): Promise<WindowState | null> {
-  return invoke<WindowState | null>('get_window_state');
+  const json = await invoke<string | null>('get_window_state');
+  if (!json) return null;
+  return JSON.parse(json) as WindowState;
 }
