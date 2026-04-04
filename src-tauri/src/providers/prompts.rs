@@ -1,3 +1,8 @@
+// Prompt validation: spike must be run manually before Wave 4 (Plans 05-06).
+// Run: cargo test --test prompt_spike -- --nocapture
+// See tests/prompt_spike.rs for full validation details and 15 test cases.
+// Gate: >=80% (12/15) space-free romaji segmentation accuracy required.
+
 /// Build the full system prompt for the given style_id.
 /// Falls back to "standard" for unrecognised style IDs.
 pub fn build_system_prompt(style_id: &str) -> String {
