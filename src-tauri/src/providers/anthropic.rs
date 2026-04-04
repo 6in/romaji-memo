@@ -115,4 +115,8 @@ impl ProviderAdapter for AnthropicAdapter {
     fn provider_type(&self) -> &str {
         "anthropic"
     }
+
+    fn model_id(&self) -> &str {
+        &self.model
+    }
 }

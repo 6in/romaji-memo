@@ -77,6 +77,8 @@ pub trait ProviderAdapter: Send + Sync {
     async fn complete(&self, req: CompletionRequest) -> Result<CompletionResponse, ProviderError>;
     fn name(&self) -> &str;
     fn provider_type(&self) -> &str;
+    /// Return the model identifier used for CompletionRequest.model.
+    fn model_id(&self) -> &str;
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────

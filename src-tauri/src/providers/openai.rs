@@ -138,4 +138,8 @@ impl ProviderAdapter for OpenAIAdapter {
     fn provider_type(&self) -> &str {
         "openai"
     }
+
+    fn model_id(&self) -> &str {
+        &self.model
+    }
 }
