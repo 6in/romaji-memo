@@ -1,6 +1,6 @@
 mod db;
 pub mod keychain;
-mod providers;
+pub mod providers;
 mod state;
 
 use std::sync::Arc;
