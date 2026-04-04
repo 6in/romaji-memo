@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "romaji-editor",
+  "productName": "Romaji Memo",
   "version": "0.1.0",
-  "identifier": "com.ohya.romaji-editor",
+  "identifier": "com.ohya.romaji-memo",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,14 +12,23 @@
   "app": {
     "windows": [
       {
-        "title": "romaji-editor",
-        "width": 800,
-        "height": 600
+        "title": "Romaji Memo",
+        "width": 420,
+        "height": 600,
+        "minWidth": 320,
+        "minHeight": 400,
+        "resizable": true,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "transparent": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self' tauri: data: blob: 'unsafe-inline'"
     }
+  },
+  "plugins": {
+    "clipboard-manager": {}
   },
   "bundle": {
     "active": true,
