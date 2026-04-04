@@ -5,6 +5,7 @@ import { LogicalSize, LogicalPosition } from '@tauri-apps/api/dpi';
 import { Toaster } from 'sonner';
 import { TitleBar } from './components/TitleBar';
 import { Converter } from './components/Converter';
+import { HistoryDrawer } from './components/HistoryDrawer';
 import { useSettingsStore } from './store/settingsStore';
 import { saveWindowState, getWindowState } from './lib/tauri';
 
@@ -73,9 +74,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="h-screen bg-background text-foreground flex flex-col overflow-hidden rounded-lg">
         <TitleBar />
-        <main className="flex-1 overflow-hidden">
+        <main className="flex-1 overflow-y-auto">
           <Converter />
         </main>
+        <HistoryDrawer />
       </div>
       <Toaster position="bottom-center" richColors theme={theme} />
     </QueryClientProvider>
