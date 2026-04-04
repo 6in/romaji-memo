@@ -153,3 +153,13 @@ None — DB is created automatically in the OS app data directory on first launc
 ---
 *Phase: 01-core-conversion-loop*
 *Completed: 2026-04-05*
+
+## Self-Check: PASSED
+
+- All 7 files created/modified: FOUND
+- Commit bb79599: FOUND
+- journal_mode=WAL in db/mod.rs: FOUND
+- conversions_fts USING fts5 in migrations.rs: FOUND
+- INSERT OR REPLACE INTO settings in settings.rs: FOUND
+- pub db: Arc<Mutex<Connection>> in state.rs: FOUND
+- manage() in lib.rs: FOUND
