@@ -28,7 +28,18 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can copy a conversion result to the clipboard with a single click
   4. User's conversion history persists after app restart and can be browsed and re-loaded into the input field
   5. App launches under 3 seconds, uses under 200MB memory, works on macOS 12+ and Windows 10+, and API keys are stored exclusively in OS Keychain
-**Plans**: TBD
+**Plans**: 8 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffold + Tauri config + all dependencies
+- [ ] 01-02-PLAN.md — SQLite DB module with migration, AppState, CRUD functions
+- [ ] 01-03-PLAN.md — Keychain module + ProviderAdapter trait + Anthropic/OpenAI adapters + prompt assembly
+- [ ] 01-04-PLAN.md — Tauri commands (convert, history, providers, window) + provider init wiring
+- [ ] 01-05-PLAN.md — App shell: TitleBar, theme toggle, window persistence, invoke wrappers
+- [ ] 01-06-PLAN.md — Converter UI: textarea, style selector, result display, copy button
+- [ ] 01-07-PLAN.md — History bottom drawer with window resize
+- [ ] 01-08-PLAN.md — README + end-to-end human verification
+
 **UI hint**: yes
 
 ### Phase 2: Daily Driver Polish
@@ -62,6 +73,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Conversion Loop | 0/? | Not started | - |
+| 1. Core Conversion Loop | 0/8 | Planned | - |
 | 2. Daily Driver Polish | 0/? | Not started | - |
 | 3. Power-User Modes | 0/? | Not started | - |
