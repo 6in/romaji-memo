@@ -1,4 +1,5 @@
 mod db;
+pub mod keychain;
 mod providers;
 mod state;
 
