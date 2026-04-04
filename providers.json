@@ -1,0 +1,31 @@
+{
+  "providers": [
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "adapter": "anthropic",
+      "api_key": "<encrypted>",
+      "model": "claude-haiku-4-5-20251001",
+      "enabled": true
+    },
+    {
+      "id": "ollama-local",
+      "name": "Ollama (Local)",
+      "adapter": "openai",
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "ollama",
+      "model": "gemma3:12b",
+      "enabled": true
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "adapter": "openai",
+      "base_url": "https://api.openai.com/v1",
+      "api_key": "<encrypted>",
+      "model": "gpt-4o-mini",
+      "enabled": false
+    }
+  ],
+  "default_provider": "anthropic"
+}
