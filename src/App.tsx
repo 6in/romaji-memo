@@ -1,15 +1,18 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
+import { Converter } from './components/Converter';
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="h-screen bg-background text-foreground">
-        <p className="p-4">Romaji Memo</p>
+      <div className="h-screen bg-background text-foreground overflow-hidden">
+        <Converter />
       </div>
+      <Toaster position="bottom-right" />
     </QueryClientProvider>
-  )
+  );
 }
 
-export default App
+export default App;
