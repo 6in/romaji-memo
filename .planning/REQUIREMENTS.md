@@ -92,50 +92,50 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONV-01 | TBD | Pending |
-| CONV-02 | TBD | Pending |
-| CONV-03 | TBD | Pending |
-| CONV-04 | TBD | Pending |
-| CONV-05 | TBD | Pending |
-| CONV-06 | TBD | Pending |
-| CONV-07 | TBD | Pending |
-| CONV-08 | TBD | Pending |
-| HIST-01 | TBD | Pending |
-| HIST-02 | TBD | Pending |
-| HIST-03 | TBD | Pending |
-| HIST-04 | TBD | Pending |
-| HIST-05 | TBD | Pending |
-| HIST-06 | TBD | Pending |
-| HIST-07 | TBD | Pending |
-| HIST-08 | TBD | Pending |
-| BUFF-01 | TBD | Pending |
-| BUFF-02 | TBD | Pending |
-| BUFF-03 | TBD | Pending |
-| BUFF-04 | TBD | Pending |
-| PROV-01 | TBD | Pending |
-| PROV-02 | TBD | Pending |
-| PROV-03 | TBD | Pending |
-| PROV-04 | TBD | Pending |
-| PROV-05 | TBD | Pending |
-| PROV-06 | TBD | Pending |
-| PROV-07 | TBD | Pending |
-| PROV-08 | TBD | Pending |
-| WINX-01 | TBD | Pending |
-| WINX-02 | TBD | Pending |
-| WINX-03 | TBD | Pending |
-| WINX-04 | TBD | Pending |
-| WINX-05 | TBD | Pending |
-| WINX-06 | TBD | Pending |
-| PLAT-01 | TBD | Pending |
-| PLAT-02 | TBD | Pending |
-| PLAT-03 | TBD | Pending |
-| PLAT-04 | TBD | Pending |
+| CONV-01 | Phase 1 | Pending |
+| CONV-02 | Phase 1 | Pending |
+| CONV-03 | Phase 1 | Pending |
+| CONV-04 | Phase 1 | Pending |
+| CONV-05 | Phase 1 | Pending |
+| CONV-06 | Phase 1 | Pending |
+| CONV-07 | Phase 2 | Pending |
+| CONV-08 | Phase 3 | Pending |
+| HIST-01 | Phase 1 | Pending |
+| HIST-02 | Phase 1 | Pending |
+| HIST-03 | Phase 1 | Pending |
+| HIST-04 | Phase 2 | Pending |
+| HIST-05 | Phase 2 | Pending |
+| HIST-06 | Phase 2 | Pending |
+| HIST-07 | Phase 2 | Pending |
+| HIST-08 | Phase 2 | Pending |
+| BUFF-01 | Phase 2 | Pending |
+| BUFF-02 | Phase 2 | Pending |
+| BUFF-03 | Phase 2 | Pending |
+| BUFF-04 | Phase 2 | Pending |
+| PROV-01 | Phase 1 | Pending |
+| PROV-02 | Phase 1 | Pending |
+| PROV-03 | Phase 2 | Pending |
+| PROV-04 | Phase 1 | Pending |
+| PROV-05 | Phase 2 | Pending |
+| PROV-06 | Phase 2 | Pending |
+| PROV-07 | Phase 1 | Pending |
+| PROV-08 | Phase 2 | Pending |
+| WINX-01 | Phase 1 | Pending |
+| WINX-02 | Phase 2 | Pending |
+| WINX-03 | Phase 1 | Pending |
+| WINX-04 | Phase 1 | Pending |
+| WINX-05 | Phase 3 | Pending |
+| WINX-06 | Phase 3 | Pending |
+| PLAT-01 | Phase 1 | Pending |
+| PLAT-02 | Phase 1 | Pending |
+| PLAT-03 | Phase 1 | Pending |
+| PLAT-04 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 38 total
-- Mapped to phases: 0
-- Unmapped: 38 ⚠️
+- Mapped to phases: 38
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-05*
-*Last updated: 2026-04-05 after initial definition*
+*Last updated: 2026-04-05 after roadmap creation*
