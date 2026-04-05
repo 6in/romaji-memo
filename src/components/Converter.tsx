@@ -49,6 +49,10 @@ export function Converter() {
         onKeyDown={handleKeyDown}
         placeholder="ローマ字を入力... (Cmd/Ctrl+Enter で変換)"
         rows={4}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
         className="w-full resize-none rounded-md p-3 bg-muted text-foreground text-sm border border-border focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
       />
 

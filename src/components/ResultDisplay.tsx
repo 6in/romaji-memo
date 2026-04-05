@@ -15,10 +15,14 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
   const addToBuffer = useBufferStore((s) => s.addItem);
   const selectedStyleId = useConversionStore((s) => s.selectedStyleId);
   const setClipboardIgnoreUntil = useConversionStore((s) => s.setClipboardIgnoreUntil);
+  const editedResult = useConversionStore((s) => s.editedResult);
+  const setEditedResult = useConversionStore((s) => s.setEditedResult);
+
+  const displayText = editedResult ?? result.converted;
 
   const handleCopy = async () => {
     try {
-      await writeText(result.converted);
+      await writeText(displayText);
       // Ignore clipboard watch callbacks for 1 second after self-copy (T-03-03)
       setClipboardIgnoreUntil(Date.now() + 1000);
       setCopied(true);
@@ -31,16 +35,22 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
 
   return (
     <div className="space-y-2">
-      {/* Converted text with copy button (CONV-06) */}
+      {/* Converted text — editable textarea (CONV-06) */}
       <div className="relative group">
-        <div className="p-3 bg-muted rounded-md text-foreground text-sm leading-relaxed whitespace-pre-wrap">
-          {result.converted}
-        </div>
+        <textarea
+          value={displayText}
+          onChange={(e) => setEditedResult(e.target.value)}
+          rows={Math.max(2, displayText.split('\n').length)}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className={`w-full resize-none p-3 bg-muted rounded-md text-foreground text-sm leading-relaxed focus:outline-none focus:ring-1 focus:ring-ring${editedResult !== null ? ' border border-primary/50' : ''}`}
+        />
         {/* Copy button area — existing + new "バッファに追加" */}
         <div className="absolute top-2 right-2 flex items-center gap-1">
           <button
             onClick={() => {
-              addToBuffer(result.converted, selectedStyleId);
+              addToBuffer(displayText, selectedStyleId);
               toast.success('バッファに追加しました');
             }}
             className="p-1.5 rounded-md bg-background/80 hover:bg-accent transition-colors"

@@ -4,6 +4,7 @@ import type { ConvertResult } from '../lib/tauri';
 interface ConversionState {
   input: string;
   result: ConvertResult | null;
+  editedResult: string | null; // null = use AI output as-is
   loading: boolean;
   error: string | null;
   selectedStyleId: string;
@@ -17,6 +18,7 @@ interface ConversionState {
   isDocumentMode: boolean;
   setInput: (input: string) => void;
   setResult: (result: ConvertResult | null) => void;
+  setEditedResult: (text: string | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setSelectedStyleId: (id: string) => void;
@@ -30,6 +32,7 @@ interface ConversionState {
 export const useConversionStore = create<ConversionState>((set) => ({
   input: '',
   result: null,
+  editedResult: null,
   loading: false,
   error: null,
   selectedStyleId: 'standard',
@@ -39,7 +42,8 @@ export const useConversionStore = create<ConversionState>((set) => ({
   clipboardIgnoreUntil: 0,
   isDocumentMode: false,
   setInput: (input) => set({ input }),
-  setResult: (result) => set({ result, error: null }),
+  setResult: (result) => set({ result, error: null, editedResult: null }),
+  setEditedResult: (text) => set({ editedResult: text }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
   setSelectedStyleId: (id) => set({ selectedStyleId: id }),

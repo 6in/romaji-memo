@@ -45,11 +45,13 @@ export function HistoryDrawer() {
   useEffect(() => {
     (async () => {
       const win = getCurrentWindow();
-      const size = await win.outerSize();
-      windowWidthRef.current = size.width;
+      const scale = await win.scaleFactor();
+      const physSize = await win.outerSize();
+      const logWidth = physSize.width / scale;
+      windowWidthRef.current = logWidth;
       const targetHeight = isDrawerOpen ? BASE_HEIGHT + DRAWER_HEIGHT : BASE_HEIGHT;
       const newHeight = Math.max(targetHeight, MIN_HEIGHT);
-      await win.setSize(new LogicalSize(size.width, newHeight));
+      await win.setSize(new LogicalSize(logWidth, newHeight));
     })();
   }, [isDrawerOpen]);
 

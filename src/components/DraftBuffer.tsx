@@ -76,11 +76,13 @@ export function DraftBuffer() {
   useEffect(() => {
     (async () => {
       const win = getCurrentWindow();
-      const size = await win.outerSize();
-      windowWidthRef.current = size.width;
-      const currentHeight = size.height;
-      const newHeight = isOpen ? currentHeight + BUFFER_HEIGHT : currentHeight - BUFFER_HEIGHT;
-      await win.setSize(new LogicalSize(size.width, Math.max(newHeight, 400)));
+      const scale = await win.scaleFactor();
+      const physSize = await win.outerSize();
+      const logWidth = physSize.width / scale;
+      const logHeight = physSize.height / scale;
+      windowWidthRef.current = logWidth;
+      const newHeight = isOpen ? logHeight + BUFFER_HEIGHT : logHeight - BUFFER_HEIGHT;
+      await win.setSize(new LogicalSize(logWidth, Math.max(newHeight, 400)));
     })();
   }, [isOpen]);
 

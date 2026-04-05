@@ -13,8 +13,11 @@ pub fn build_system_prompt(style_id: &str) -> String {
         "okama" => "おかまっぽい口調。〜わよ、〜かしら等。",
         "bushi" => "武士言葉・時代劇風。〜でござる等。",
         "gal" => "ギャル語・若者言葉。マジ、てか等。",
-        "business" => "ビジネスメール敬語。〜かと存じます等。",
-        "prompt" => "効果的な英語AIプロンプトに変換。意図を正確に英語で。",
+        "business" => "ビジネスメール・ビジネス文書向けの正式な敬語表現に変換。\
+「〜していただけますでしょうか」「〜かと存じます」「〜させていただきます」\
+「お世話になっております」「ご確認のほどよろしくお願いいたします」等を適切に使用。\
+主語・述語を明確にし、受動態を多用した丁寧な文体にすること。",
+        "prompt" => "Output MUST be in English only. Convert to an effective English AI prompt. Express the intent accurately in English. Do NOT output Japanese.",
         // Unknown styles fall back to standard
         _ => "自然な日本語に変換してください。",
     };
