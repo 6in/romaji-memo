@@ -183,3 +183,25 @@ export async function pingProvider(baseUrl: string, apiKey: string | null): Prom
 export async function setActiveProvider(providerId: string): Promise<void> {
   return invoke('set_active_provider', { providerId });
 }
+
+// --- Copilot Device Flow ---
+
+export interface DeviceCodeResponse {
+  device_code: string;
+  user_code: string;
+  verification_uri: string;
+  expires_in: number;
+  interval: number;
+}
+
+export async function startCopilotAuth(): Promise<DeviceCodeResponse> {
+  return invoke<DeviceCodeResponse>('start_copilot_auth');
+}
+
+export async function pollCopilotAuth(
+  deviceCode: string,
+  interval: number,
+  providerId: string,
+): Promise<void> {
+  return invoke('poll_copilot_auth', { deviceCode, interval, providerId });
+}
