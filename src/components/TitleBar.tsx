@@ -2,6 +2,7 @@ import { Pin, Sun, Moon, Minus, X } from 'lucide-react';
 import { useSettingsStore } from '../store/settingsStore';
 import { toggleAlwaysOnTop, quitApp } from '../lib/tauri';
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { SettingsDialog } from './settings/SettingsDialog';
 
 export function TitleBar() {
   const { alwaysOnTop, setAlwaysOnTop, theme, toggleTheme } = useSettingsStore();
@@ -73,6 +74,7 @@ export function TitleBar() {
             <Moon size={12} className="text-muted-foreground" />
           )}
         </button>
+        <SettingsDialog />
         <button
           onClick={handleMinimize}
           className="p-1 rounded hover:bg-accent transition-colors"
