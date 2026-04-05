@@ -31,14 +31,14 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 8 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffold + Tauri config + all dependencies
-- [ ] 01-02-PLAN.md — SQLite DB module with migration, AppState, CRUD functions
-- [ ] 01-03-PLAN.md — Keychain module + ProviderAdapter trait + Anthropic/OpenAI adapters + prompt assembly
-- [ ] 01-04-PLAN.md — Tauri commands (convert, history, providers, window) + provider init wiring
-- [ ] 01-05-PLAN.md — App shell: TitleBar, theme toggle, window persistence, invoke wrappers
-- [ ] 01-06-PLAN.md — Converter UI: textarea, style selector, result display, copy button
-- [ ] 01-07-PLAN.md — History bottom drawer with window resize
-- [ ] 01-08-PLAN.md — README + end-to-end human verification
+- [x] 01-01-PLAN.md — Project scaffold + Tauri config + all dependencies
+- [x] 01-02-PLAN.md — SQLite DB module with migration, AppState, CRUD functions
+- [x] 01-03-PLAN.md — Keychain module + ProviderAdapter trait + Anthropic/OpenAI adapters + prompt assembly
+- [x] 01-04-PLAN.md — Tauri commands (convert, history, providers, window) + provider init wiring
+- [x] 01-05-PLAN.md — App shell: TitleBar, theme toggle, window persistence, invoke wrappers
+- [x] 01-06-PLAN.md — Converter UI: textarea, style selector, result display, copy button
+- [x] 01-07-PLAN.md — History bottom drawer with window resize
+- [x] 01-08-PLAN.md — README + end-to-end human verification
 
 **UI hint**: yes
 
