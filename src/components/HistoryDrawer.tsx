@@ -15,7 +15,7 @@ const MIN_HEIGHT = 400;    // minimum window height guard (RESEARCH.md Q3)
 export function HistoryDrawer() {
   const { isDrawerOpen, toggleDrawer } = useHistoryStore();
   const { setInput, setSelectedStyleId } = useConversionStore();
-  const { data: history, isLoading } = useHistory(isDrawerOpen);
+  const { data: history, isLoading } = useHistory({ enabled: isDrawerOpen });
   const queryClient = useQueryClient();
   const windowWidthRef = useRef(420);
 

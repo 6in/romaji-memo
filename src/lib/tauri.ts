@@ -79,3 +79,107 @@ export async function getWindowState(): Promise<WindowState | null> {
   if (!json) return null;
   return JSON.parse(json) as WindowState;
 }
+
+// --- Phase 2 Types ---
+
+export interface CustomStyle {
+  id: string;
+  label: string;
+  emoji: string;
+  prompt: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface ProviderConfig {
+  id: string;
+  name: string;
+  adapter: string;
+  baseUrl: string | null;
+  apiKey: string | null;
+  model: string;
+  enabled: boolean;
+}
+
+export interface ProvidersFile {
+  providers: ProviderConfig[];
+  defaultProvider: string;
+}
+
+// --- History Commands ---
+
+export async function searchHistory(
+  query: string,
+  styleFilter: string | null,
+  limit: number,
+  offset: number,
+): Promise<ConversionRecord[]> {
+  return invoke<ConversionRecord[]>('search_history', { query, styleFilter, limit, offset });
+}
+
+export async function pinHistory(id: number, pinned: boolean): Promise<void> {
+  return invoke('pin_history', { id, pinned });
+}
+
+export async function deleteHistory(id: number): Promise<void> {
+  return invoke('delete_history', { id });
+}
+
+export async function setHistoryLimit(limit: number): Promise<void> {
+  return invoke('set_history_limit', { limit });
+}
+
+export async function getHistoryLimit(): Promise<number> {
+  return invoke<number>('get_history_limit');
+}
+
+// --- Style Commands ---
+
+export async function listCustomStyles(): Promise<CustomStyle[]> {
+  return invoke<CustomStyle[]>('list_styles');
+}
+
+export async function createCustomStyle(
+  id: string,
+  label: string,
+  emoji: string,
+  prompt: string,
+  sortOrder: number,
+): Promise<void> {
+  return invoke('create_style', { id, label, emoji, prompt, sortOrder });
+}
+
+export async function updateCustomStyle(
+  id: string,
+  label: string,
+  emoji: string,
+  prompt: string,
+): Promise<void> {
+  return invoke('update_style', { id, label, emoji, prompt });
+}
+
+export async function deleteCustomStyle(id: string): Promise<void> {
+  return invoke('delete_style', { id });
+}
+
+// --- Provider Commands ---
+
+export async function getProviderConfig(): Promise<ProvidersFile> {
+  return invoke<ProvidersFile>('get_provider_config');
+}
+
+export async function upsertProvider(config: ProviderConfig): Promise<void> {
+  return invoke('upsert_provider', { config });
+}
+
+export async function deleteProvider(providerId: string): Promise<void> {
+  return invoke('delete_provider', { providerId });
+}
+
+export async function pingProvider(baseUrl: string, apiKey: string | null): Promise<string> {
+  return invoke<string>('ping_provider', { baseUrl, apiKey });
+}
+
+export async function setActiveProvider(providerId: string): Promise<void> {
+  return invoke('set_active_provider', { providerId });
+}
