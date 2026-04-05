@@ -132,7 +132,7 @@
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
 ## Conventions
 
-Conventions not yet established. Will populate as patterns emerge during development.
+**言語:** すべての応答は日本語で行うこと。GSDワークフロー（バナー、チェックポイント、進捗レポートなど）の出力も含む。
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->

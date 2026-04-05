@@ -76,9 +76,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Rust/JS プラグイン追加 + ミニモード + クリップボード監視
-- [ ] 03-02-PLAN.md — 長文書モード UI + documentStore + エクスポート
-- [ ] 03-03-PLAN.md — Phase 3 統合検証 (human-verify)
+- [x] 03-01-PLAN.md — Rust/JS プラグイン追加 + ミニモード + クリップボード監視
+- [x] 03-02-PLAN.md — 長文書モード UI + documentStore + エクスポート
+- [x] 03-03-PLAN.md — Phase 3 統合検証 (human-verify)
 
 **UI hint**: yes
 

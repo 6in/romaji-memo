@@ -1060,22 +1060,13 @@ The following order respects hard technical dependencies. Each step creates the 
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Space-free segmentation prompt reliability**
-   - What we know: The system prompt template in design §3.1 explicitly addresses this; it has not been tested against a real LLM in this codebase.
-   - What's unclear: Whether the prompt reliably handles edge cases (mixed romaji/English, ambiguous boundaries like `tokyoni` vs `tokiyo ni`).
-   - Recommendation: First task in Wave 3 is a prompt spike — run 10-15 test inputs against both Anthropic and OpenAI adapters, iterate on the prompt until segmentation is reliable. Do not build the full UI until this is validated.
+1. **Space-free segmentation prompt reliability** — RESOLVED: Plan 04 Task 0 is a prompt validation spike (15 test cases, ≥80% accuracy gate) that must pass before Wave 4 UI plans execute.
 
-2. **Windows Keychain (Credential Manager) `cmdkey` format**
-   - What we know: D-07 specifies `cmdkey /add:romaji-memo-anthropic /user:api_key /pass:<API_KEY>`. The `keyring` crate uses `(service, username)` as the credential identity.
-   - What's unclear: Whether the `cmdkey` credential name format (`romaji-memo-anthropic`) matches what `keyring::Entry::new("romaji-memo", "anthropic")` produces on Windows.
-   - Recommendation: Verify the exact credential storage format by writing a Rust test that calls `set_api_key("anthropic", "test")` and reads it back, then checking Windows Credential Manager to confirm the name format. Document the exact `cmdkey` command that corresponds to `Entry::new("romaji-memo", "anthropic")`.
+2. **Windows Keychain (Credential Manager) `cmdkey` format** — RESOLVED: Correct format is `cmdkey /add:romaji-memo /user:anthropic` matching `Entry::new("romaji-memo", "anthropic")`. D-07 in CONTEXT.md had wrong format; Plan 08 README uses corrected format.
 
-3. **History drawer window expand on Windows**
-   - What we know: D-12 specifies window height expands when drawer opens. `getCurrentWindow().setSize()` is the Tauri API.
-   - What's unclear: Whether `setSize()` on Windows has minimum size constraints or animation behavior that differs from macOS.
-   - Recommendation: Test drawer expand/collapse on Windows in Wave 5 integration; add a minimum height guard.
+3. **History drawer window expand on Windows** — RESOLVED: Plan 07 enforces `MIN_HEIGHT = 400` via `Math.max(targetHeight, MIN_HEIGHT)`. Plan 08 checkpoint includes Windows drawer resize test (step B.16).
 
 ---
 
