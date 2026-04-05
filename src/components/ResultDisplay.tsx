@@ -1,8 +1,10 @@
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import type { ConvertResult } from '../lib/tauri';
 import { toast } from 'sonner';
+import { useBufferStore } from '../store/bufferStore';
+import { useConversionStore } from '../store/conversionStore';
 
 interface ResultDisplayProps {
   result: ConvertResult;
@@ -10,6 +12,8 @@ interface ResultDisplayProps {
 
 export function ResultDisplay({ result }: ResultDisplayProps) {
   const [copied, setCopied] = useState(false);
+  const addToBuffer = useBufferStore((s) => s.addItem);
+  const selectedStyleId = useConversionStore((s) => s.selectedStyleId);
 
   const handleCopy = async () => {
     try {
@@ -29,17 +33,30 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
         <div className="p-3 bg-muted rounded-md text-foreground text-sm leading-relaxed whitespace-pre-wrap">
           {result.converted}
         </div>
-        <button
-          onClick={handleCopy}
-          className="absolute top-2 right-2 p-1.5 rounded-md bg-background/80 hover:bg-accent transition-colors"
-          title="Copy to clipboard"
-        >
-          {copied ? (
-            <Check size={14} className="text-green-500" />
-          ) : (
-            <Copy size={14} className="text-muted-foreground" />
-          )}
-        </button>
+        {/* Copy button area — existing + new "バッファに追加" */}
+        <div className="absolute top-2 right-2 flex items-center gap-1">
+          <button
+            onClick={() => {
+              addToBuffer(result.converted, selectedStyleId);
+              toast.success('バッファに追加しました');
+            }}
+            className="p-1.5 rounded-md bg-background/80 hover:bg-accent transition-colors"
+            title="バッファに追加"
+          >
+            <FileText size={14} className="text-muted-foreground" />
+          </button>
+          <button
+            onClick={handleCopy}
+            className="p-1.5 rounded-md bg-background/80 hover:bg-accent transition-colors"
+            title="Copy to clipboard"
+          >
+            {copied ? (
+              <Check size={14} className="text-green-500" />
+            ) : (
+              <Copy size={14} className="text-muted-foreground" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Intent display (CONV-04) */}
