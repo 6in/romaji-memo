@@ -1,3 +1,10 @@
+/// Quit the application entirely.
+/// More reliable than frontend window.close() for Accessory-policy apps on macOS.
+#[tauri::command]
+pub async fn quit_app(app_handle: tauri::AppHandle) {
+    app_handle.exit(0);
+}
+
 /// Toggle the always-on-top state of the main window.
 /// Returns the new state (true = always on top, false = normal).
 ///

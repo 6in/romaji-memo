@@ -21,6 +21,7 @@ pub fn run() {
             commands::convert::convert,
             commands::history::get_history,
             commands::providers::list_providers,
+            commands::window::quit_app,
             commands::window::toggle_always_on_top,
             commands::window::save_window_state,
             commands::window::get_window_state,

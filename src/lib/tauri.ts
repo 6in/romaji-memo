@@ -70,6 +70,10 @@ export async function saveWindowState(
   return invoke('save_window_state', { x, y, width, height });
 }
 
+export async function quitApp(): Promise<void> {
+  return invoke('quit_app');
+}
+
 export async function getWindowState(): Promise<WindowState | null> {
   const json = await invoke<string | null>('get_window_state');
   if (!json) return null;

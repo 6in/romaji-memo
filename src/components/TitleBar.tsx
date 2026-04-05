@@ -1,10 +1,20 @@
 import { Pin, Sun, Moon, Minus, X } from 'lucide-react';
 import { useSettingsStore } from '../store/settingsStore';
-import { toggleAlwaysOnTop } from '../lib/tauri';
+import { toggleAlwaysOnTop, quitApp } from '../lib/tauri';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
 export function TitleBar() {
   const { alwaysOnTop, setAlwaysOnTop, theme, toggleTheme } = useSettingsStore();
+
+  const handleDragStart = async (e: React.MouseEvent) => {
+    // Only drag on left-click on the drag region itself (not buttons)
+    if (e.button !== 0) return;
+    try {
+      await getCurrentWindow().startDragging();
+    } catch (err) {
+      console.error('Failed to start dragging:', err);
+    }
+  };
 
   const handleTogglePin = async () => {
     try {
@@ -16,24 +26,32 @@ export function TitleBar() {
   };
 
   const handleMinimize = async () => {
-    const win = getCurrentWindow();
-    await win.minimize();
+    try {
+      await getCurrentWindow().minimize();
+    } catch (err) {
+      console.error('Failed to minimize:', err);
+    }
   };
 
   const handleClose = async () => {
-    const win = getCurrentWindow();
-    await win.close();
+    try {
+      await quitApp();
+    } catch (err) {
+      console.error('Failed to quit:', err);
+      // Fallback
+      await getCurrentWindow().close();
+    }
   };
 
   return (
     <div
-      data-tauri-drag-region
+      onMouseDown={handleDragStart}
       className="h-8 flex items-center justify-between px-3 select-none cursor-move bg-background/80 backdrop-blur-sm border-b border-border"
     >
-      <span data-tauri-drag-region className="text-xs font-medium text-muted-foreground">
+      <span className="text-xs font-medium text-muted-foreground pointer-events-none">
         Romaji Memo
       </span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1" onMouseDown={(e) => e.stopPropagation()}>
         <button
           onClick={handleTogglePin}
           title={alwaysOnTop ? 'Always on Top: ON' : 'Always on Top: OFF'}
@@ -63,7 +81,7 @@ export function TitleBar() {
         </button>
         <button
           onClick={handleClose}
-          className="p-1 rounded hover:bg-destructive transition-colors"
+          className="p-1 rounded hover:bg-destructive/20 hover:text-destructive transition-colors"
         >
           <X size={12} className="text-muted-foreground" />
         </button>
