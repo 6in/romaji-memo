@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 import { TitleBar } from './components/TitleBar';
 import { Converter } from './components/Converter';
 import { HistoryDrawer } from './components/HistoryDrawer';
+import { DraftBuffer } from './components/DraftBuffer';
 import { useSettingsStore } from './store/settingsStore';
 import { saveWindowState, getWindowState } from './lib/tauri';
 
@@ -77,6 +78,7 @@ function App() {
         <main className="flex-1 overflow-y-auto">
           <Converter />
         </main>
+        <DraftBuffer />
         <HistoryDrawer />
       </div>
       <Toaster position="bottom-center" richColors theme={theme} />
