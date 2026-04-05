@@ -71,7 +71,8 @@ pub fn search_history(
                  ORDER BY pinned DESC, created_at DESC
                  LIMIT ?3 OFFSET ?4"
             )?;
-            stmt.query_map(rusqlite::params![like_pattern, style, limit, offset], map_row)?.collect()
+            let rows: Result<Vec<_>, _> = stmt.query_map(rusqlite::params![like_pattern, style, limit, offset], map_row)?.collect();
+            rows
         } else {
             let mut stmt = conn.prepare(
                 "SELECT id, input, output, style_id, intent, typo, provider_id, model, pinned, created_at
@@ -80,7 +81,8 @@ pub fn search_history(
                  ORDER BY pinned DESC, created_at DESC
                  LIMIT ?2 OFFSET ?3"
             )?;
-            stmt.query_map(rusqlite::params![like_pattern, limit, offset], map_row)?.collect()
+            let rows: Result<Vec<_>, _> = stmt.query_map(rusqlite::params![like_pattern, limit, offset], map_row)?.collect();
+            rows
         }
     } else {
         let fts_query = format!("\"{}\"", query.replace('"', ""));
@@ -94,7 +96,8 @@ pub fn search_history(
                  ORDER BY c.pinned DESC, c.created_at DESC
                  LIMIT ?3 OFFSET ?4"
             )?;
-            stmt.query_map(rusqlite::params![fts_query, style, limit, offset], map_row)?.collect()
+            let rows: Result<Vec<_>, _> = stmt.query_map(rusqlite::params![fts_query, style, limit, offset], map_row)?.collect();
+            rows
         } else {
             let mut stmt = conn.prepare(
                 "SELECT c.id, c.input, c.output, c.style_id, c.intent, c.typo,
@@ -105,7 +108,8 @@ pub fn search_history(
                  ORDER BY c.pinned DESC, c.created_at DESC
                  LIMIT ?2 OFFSET ?3"
             )?;
-            stmt.query_map(rusqlite::params![fts_query, limit, offset], map_row)?.collect()
+            let rows: Result<Vec<_>, _> = stmt.query_map(rusqlite::params![fts_query, limit, offset], map_row)?.collect();
+            rows
         }
     }
 }
