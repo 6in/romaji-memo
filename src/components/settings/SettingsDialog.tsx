@@ -3,6 +3,7 @@ import { Settings } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { ProviderSettings } from './ProviderSettings';
+import { StyleManager } from './StyleManager';
 
 export function SettingsDialog() {
   const [open, setOpen] = useState(false);
@@ -50,8 +51,7 @@ export function SettingsDialog() {
             <ProviderSettings />
           </TabsContent>
           <TabsContent value="styles" className="flex-1 overflow-y-auto m-0 p-4">
-            {/* Plan 06 で StyleManager を配置 */}
-            <div className="text-xs text-muted-foreground">スタイル設定は準備中...</div>
+            <StyleManager />
           </TabsContent>
           <TabsContent value="general" className="flex-1 overflow-y-auto m-0 p-4">
             {/* Plan 06 で HistorySettings を配置 */}
