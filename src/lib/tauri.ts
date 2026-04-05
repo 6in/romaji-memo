@@ -1,6 +1,8 @@
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { LogicalSize } from '@tauri-apps/api/dpi';
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
 
 // --- Types ---
 
@@ -226,4 +228,16 @@ export async function pollCopilotAuth(
   providerId: string,
 ): Promise<void> {
   return invoke('poll_copilot_auth', { deviceCode, interval, providerId });
+}
+
+// --- Document Export (CONV-08) ---
+
+export async function exportDocument(content: string, format: 'md' | 'txt'): Promise<boolean> {
+  const path = await save({
+    filters: [{ name: format === 'md' ? 'Markdown' : 'Text', extensions: [format] }],
+    defaultPath: `document.${format}`,
+  });
+  if (!path) return false;
+  await writeTextFile(path, content);
+  return true;
 }
