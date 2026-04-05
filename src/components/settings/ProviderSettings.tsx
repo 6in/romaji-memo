@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Loader2, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { Input } from '../ui/input';
 import {
   useProviderConfig,
@@ -10,6 +10,7 @@ import {
 } from '../../hooks/useProviders';
 import { useSettingsStore } from '../../store/settingsStore';
 import type { ProviderConfig } from '../../lib/tauri';
+import { startCopilotAuth, pollCopilotAuth } from '../../lib/tauri';
 
 export function ProviderSettings() {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -17,6 +18,10 @@ export function ProviderSettings() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [pingResult, setPingResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [copilotAuthPending, setCopilotAuthPending] = useState(false);
+  const [copilotUserCode, setCopilotUserCode] = useState('');
+  const [copilotVerificationUri, setCopilotVerificationUri] = useState('');
+  const [copilotAuthResult, setCopilotAuthResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const { data: providerConfig, isLoading } = useProviderConfig();
   const { activeProviderId, setActiveProviderId } = useSettingsStore();
@@ -37,6 +42,42 @@ export function ProviderSettings() {
     setEditForm({});
     setPingResult(null);
     setIsAdding(false);
+    setCopilotAuthPending(false);
+    setCopilotUserCode('');
+    setCopilotVerificationUri('');
+    setCopilotAuthResult(null);
+  };
+
+  const handleCopilotAuth = async () => {
+    if (!editForm.id) return;
+    setCopilotAuthPending(true);
+    setCopilotAuthResult(null);
+    try {
+      const resp = await startCopilotAuth();
+      setCopilotUserCode(resp.user_code);
+      setCopilotVerificationUri(resp.verification_uri);
+      // バックグラウンドでポーリング開始
+      pollCopilotAuth(resp.device_code, resp.interval, editForm.id)
+        .then(() => {
+          setCopilotAuthResult({ success: true, message: '認証成功。プロバイダーを保存してください。' });
+          setCopilotAuthPending(false);
+          // providers.json に "<encrypted>" として保存するため apiKey を更新
+          setEditForm((f) => ({ ...f, apiKey: '<encrypted>' }));
+        })
+        .catch((err: unknown) => {
+          setCopilotAuthResult({
+            success: false,
+            message: err instanceof Error ? err.message : String(err),
+          });
+          setCopilotAuthPending(false);
+        });
+    } catch (err) {
+      setCopilotAuthResult({
+        success: false,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      setCopilotAuthPending(false);
+    }
   };
 
   const handleSave = async () => {
@@ -138,7 +179,9 @@ export function ProviderSettings() {
                   ローカル
                 </span>
               )}
-              <span className="text-[10px] text-muted-foreground">{provider.adapter}</span>
+              <span className="text-[10px] text-muted-foreground">
+                {provider.adapter === 'copilot' ? 'copilot (実験的)' : provider.adapter}
+              </span>
               {!isActive && !isEditing && (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleSetActive(provider.id); }}
@@ -177,18 +220,21 @@ export function ProviderSettings() {
                   >
                     <option value="anthropic">anthropic</option>
                     <option value="openai">openai</option>
+                    <option value="copilot">Copilot (実験的)</option>
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] text-muted-foreground">Base URL</label>
-                  <Input
-                    className="text-xs font-mono h-7"
-                    value={editForm.baseUrl ?? ''}
-                    onChange={(e) => setEditForm({ ...editForm, baseUrl: e.target.value })}
-                    placeholder="https://api.openai.com/v1"
-                  />
-                </div>
+                {editForm.adapter !== 'copilot' && (
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-muted-foreground">Base URL</label>
+                    <Input
+                      className="text-xs font-mono h-7"
+                      value={editForm.baseUrl ?? ''}
+                      onChange={(e) => setEditForm({ ...editForm, baseUrl: e.target.value })}
+                      placeholder="https://api.openai.com/v1"
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-1">
                   <label className="text-[11px] text-muted-foreground">モデル</label>
@@ -196,24 +242,82 @@ export function ProviderSettings() {
                     className="text-sm h-7"
                     value={editForm.model ?? ''}
                     onChange={(e) => setEditForm({ ...editForm, model: e.target.value })}
-                    placeholder="gpt-4o"
+                    placeholder={editForm.adapter === 'copilot' ? 'gpt-4o' : 'gpt-4o'}
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] text-muted-foreground">API キー</label>
-                  <Input
-                    type="password"
-                    className="text-xs font-mono h-7"
-                    value={editForm.apiKey === '<encrypted>' ? '' : (editForm.apiKey ?? '')}
-                    onChange={(e) => setEditForm({ ...editForm, apiKey: e.target.value })}
-                    placeholder={
-                      provider.apiKey === '<encrypted>'
-                        ? '(変更する場合のみ入力)'
-                        : 'sk-...'
-                    }
-                  />
-                </div>
+                {editForm.adapter === 'copilot' ? (
+                  <div className="space-y-2 rounded-md border border-border p-2">
+                    <p className="text-[11px] text-muted-foreground">
+                      GitHub Copilot (実験的) — Device Flow で認証します。
+                    </p>
+                    <p className="text-[10px] text-destructive">
+                      注意: GitHub Copilot の内部 API を使用します。GitHub の利用規約に抵触する可能性があります。自己責任でご利用ください。
+                    </p>
+                    {copilotUserCode && (
+                      <div className="space-y-1">
+                        <p className="text-[11px] text-muted-foreground">
+                          以下のコードを入力してください:
+                        </p>
+                        <p className="text-sm font-mono font-bold tracking-widest text-center py-1">
+                          {copilotUserCode}
+                        </p>
+                        <a
+                          href={copilotVerificationUri}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-1 text-[11px] text-primary hover:underline"
+                        >
+                          <ExternalLink size={10} />
+                          {copilotVerificationUri}
+                        </a>
+                        {copilotAuthPending && (
+                          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                            <Loader2 size={10} className="animate-spin" />
+                            認証待機中...
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {copilotAuthResult?.success && (
+                      <p className="text-[11px] text-primary">{copilotAuthResult.message}</p>
+                    )}
+                    {copilotAuthResult && !copilotAuthResult.success && (
+                      <p className="text-[11px] text-destructive">エラー: {copilotAuthResult.message}</p>
+                    )}
+                    {!copilotUserCode && (
+                      <button
+                        onClick={handleCopilotAuth}
+                        disabled={copilotAuthPending}
+                        className="bg-secondary text-secondary-foreground text-xs px-3 py-1 rounded-md disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {copilotAuthPending ? (
+                          <>
+                            <Loader2 size={12} className="animate-spin" />
+                            認証開始中...
+                          </>
+                        ) : (
+                          'GitHub で認証'
+                        )}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-muted-foreground">API キー</label>
+                    <Input
+                      type="password"
+                      className="text-xs font-mono h-7"
+                      value={editForm.apiKey === '<encrypted>' ? '' : (editForm.apiKey ?? '')}
+                      onChange={(e) => setEditForm({ ...editForm, apiKey: e.target.value })}
+                      placeholder={
+                        provider.apiKey === '<encrypted>'
+                          ? '(変更する場合のみ入力)'
+                          : 'sk-...'
+                      }
+                    />
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2">
                   <input
@@ -339,18 +443,21 @@ export function ProviderSettings() {
               >
                 <option value="anthropic">anthropic</option>
                 <option value="openai">openai</option>
+                <option value="copilot">Copilot (実験的)</option>
               </select>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[11px] text-muted-foreground">Base URL</label>
-              <Input
-                className="text-xs font-mono h-7"
-                value={editForm.baseUrl ?? ''}
-                onChange={(e) => setEditForm({ ...editForm, baseUrl: e.target.value })}
-                placeholder="https://api.openai.com/v1"
-              />
-            </div>
+            {editForm.adapter !== 'copilot' && (
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground">Base URL</label>
+                <Input
+                  className="text-xs font-mono h-7"
+                  value={editForm.baseUrl ?? ''}
+                  onChange={(e) => setEditForm({ ...editForm, baseUrl: e.target.value })}
+                  placeholder="https://api.openai.com/v1"
+                />
+              </div>
+            )}
 
             <div className="space-y-1">
               <label className="text-[11px] text-muted-foreground">モデル</label>
@@ -362,16 +469,72 @@ export function ProviderSettings() {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[11px] text-muted-foreground">API キー</label>
-              <Input
-                type="password"
-                className="text-xs font-mono h-7"
-                value={editForm.apiKey ?? ''}
-                onChange={(e) => setEditForm({ ...editForm, apiKey: e.target.value })}
-                placeholder="sk-..."
-              />
-            </div>
+            {editForm.adapter === 'copilot' ? (
+              <div className="space-y-2 rounded-md border border-border p-2">
+                <p className="text-[11px] text-muted-foreground">
+                  GitHub Copilot (実験的) — Device Flow で認証します。
+                </p>
+                <p className="text-[10px] text-destructive">
+                  注意: GitHub Copilot の内部 API を使用します。GitHub の利用規約に抵触する可能性があります。自己責任でご利用ください。
+                </p>
+                {copilotUserCode && (
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-muted-foreground">以下のコードを入力してください:</p>
+                    <p className="text-sm font-mono font-bold tracking-widest text-center py-1">
+                      {copilotUserCode}
+                    </p>
+                    <a
+                      href={copilotVerificationUri}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-1 text-[11px] text-primary hover:underline"
+                    >
+                      <ExternalLink size={10} />
+                      {copilotVerificationUri}
+                    </a>
+                    {copilotAuthPending && (
+                      <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                        <Loader2 size={10} className="animate-spin" />
+                        認証待機中...
+                      </p>
+                    )}
+                  </div>
+                )}
+                {copilotAuthResult?.success && (
+                  <p className="text-[11px] text-primary">{copilotAuthResult.message}</p>
+                )}
+                {copilotAuthResult && !copilotAuthResult.success && (
+                  <p className="text-[11px] text-destructive">エラー: {copilotAuthResult.message}</p>
+                )}
+                {!copilotUserCode && (
+                  <button
+                    onClick={handleCopilotAuth}
+                    disabled={copilotAuthPending}
+                    className="bg-secondary text-secondary-foreground text-xs px-3 py-1 rounded-md disabled:opacity-50 flex items-center gap-1"
+                  >
+                    {copilotAuthPending ? (
+                      <>
+                        <Loader2 size={12} className="animate-spin" />
+                        認証開始中...
+                      </>
+                    ) : (
+                      'GitHub で認証'
+                    )}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground">API キー</label>
+                <Input
+                  type="password"
+                  className="text-xs font-mono h-7"
+                  value={editForm.apiKey ?? ''}
+                  onChange={(e) => setEditForm({ ...editForm, apiKey: e.target.value })}
+                  placeholder="sk-..."
+                />
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
               <input

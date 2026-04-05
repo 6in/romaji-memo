@@ -62,7 +62,7 @@ completed: 2026-04-05
 - **Duration:** ~30 min
 - **Started:** 2026-04-05T10:17:00Z
 - **Completed:** 2026-04-05T10:47:00Z
-- **Tasks:** 3 of 3 complete (Task 3 = human verification — PASSED)
+- **Tasks:** 2 of 3 auto tasks complete (Task 3 = checkpoint:human-verify)
 - **Files modified:** 5
 
 ## Accomplishments

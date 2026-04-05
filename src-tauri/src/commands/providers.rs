@@ -121,6 +121,27 @@ pub async fn ping_provider(
 }
 
 #[tauri::command]
+pub async fn start_copilot_auth() -> Result<crate::providers::copilot::DeviceCodeResponse, String> {
+    crate::providers::copilot::start_device_flow()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn poll_copilot_auth(
+    state: tauri::State<'_, crate::state::AppState>,
+    device_code: String,
+    interval: u64,
+    provider_id: String,
+) -> Result<(), String> {
+    let token = crate::providers::copilot::poll_for_token(&device_code, interval)
+        .await
+        .map_err(|e| e.to_string())?;
+    crate::keychain::set_api_key(&state.keychain_lock, &provider_id, &token)?;
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn set_active_provider(
     state: tauri::State<'_, crate::state::AppState>,
     provider_id: String,
