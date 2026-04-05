@@ -552,22 +552,19 @@ function SortableBufferItem({ item }: { item: { id: string; text: string } }) {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **GitHub Copilot Device Flow の実装可否**
+1. **GitHub Copilot Device Flow の実装可否** (RESOLVED)
    - What we know: `github.com/login/device/code` エンドポイントは標準 OAuth で動作する。`copilot_internal` は動作するが ToS グレー。
-   - What's unclear: Tauri 2.10 ビルド + 2026-04 時点で token が正常に発行されるか実装前の spike が必要。
-   - Recommendation: Plan を独立させ、他要件すべて完了後に着手。失敗したら PROV-03 を v2 デファーへ。
+   - Resolution: Plan 07 にて実験的実装として進める。失敗した場合は PROV-03 を v3 デファー。
 
-2. **macOS `set_focus()` の Tauri 2.10.3 での状態**
+2. **macOS `set_focus()` の Tauri 2.10.3 での状態** (RESOLVED)
    - What we know: Issue #12834 は tao 由来のバグとして報告済み。Issue はクローズされている。
-   - What's unclear: Tauri 2.10.3 (2026-04 最新) で修正済みかどうか。
-   - Recommendation: JS fallback パターン (`listen('request-focus')`) を併用して安全側に倒す。
+   - Resolution: Tauri 2.10.3 で修正確認。fallback として `window.__TAURI__.window.getCurrent().setFocus()` を使用。
 
-3. **HistoryDrawer の拡張 vs. 再設計**
+3. **HistoryDrawer の拡張 vs. 再設計** (RESOLVED)
    - What we know: 現行 `HistoryDrawer.tsx` は 127 行のシンプルな実装。検索・フィルター・ピン・削除を追加すると複雑化。
-   - What's unclear: 既存 UI を拡張するか、Settings ダイアログ内に新 History タブを作るか。
-   - Recommendation: HistoryDrawer は検索・フィルター UI を追加で拡張。設定 (limit 変更) のみ SettingsDialog に配置して役割を分ける。
+   - Resolution: Plan 03 にて既存コンポーネント拡張アプローチを採用。
 
 ---
 
