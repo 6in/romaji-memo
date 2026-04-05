@@ -1,12 +1,19 @@
 import { BUILT_IN_STYLES } from '../lib/styles';
 import { useConversionStore } from '../store/conversionStore';
+import { useCustomStyles } from '../hooks/useCustomStyles';
 
 export function StyleSelector() {
   const { selectedStyleId, setSelectedStyleId } = useConversionStore();
+  const { data: customStyles } = useCustomStyles();
+
+  const allStyles = [
+    ...BUILT_IN_STYLES,
+    ...(customStyles ?? []).map((s) => ({ id: s.id, label: s.label, emoji: s.emoji })),
+  ];
 
   return (
     <div className="flex flex-wrap gap-1.5">
-      {BUILT_IN_STYLES.map((style) => (
+      {allStyles.map((style) => (
         <button
           key={style.id}
           onClick={() => setSelectedStyleId(style.id)}

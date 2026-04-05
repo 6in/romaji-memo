@@ -14,3 +14,8 @@ export const BUILT_IN_STYLES: StylePreset[] = [
   { id: 'business', label: 'ビジネス', emoji: '💼' },
   { id: 'prompt', label: 'AIプロンプト', emoji: '🤖' },
 ];
+
+/** ビルトインスタイルか判定 */
+export function isBuiltInStyle(styleId: string): boolean {
+  return BUILT_IN_STYLES.some((s) => s.id === styleId);
+}

@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { ProviderSettings } from './ProviderSettings';
 import { StyleManager } from './StyleManager';
+import { HistorySettings } from './HistorySettings';
 
 export function SettingsDialog() {
   const [open, setOpen] = useState(false);
@@ -54,8 +55,7 @@ export function SettingsDialog() {
             <StyleManager />
           </TabsContent>
           <TabsContent value="general" className="flex-1 overflow-y-auto m-0 p-4">
-            {/* Plan 06 で HistorySettings を配置 */}
-            <div className="text-xs text-muted-foreground">全般設定は準備中...</div>
+            <HistorySettings />
           </TabsContent>
         </Tabs>
       </SheetContent>
