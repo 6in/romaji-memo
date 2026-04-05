@@ -1,11 +1,20 @@
-import { Pin, Sun, Moon, Minus, X } from 'lucide-react';
+import { Pin, Sun, Moon, Minus, X, Minimize2, Maximize2, ClipboardCheck, ClipboardPaste } from 'lucide-react';
 import { useSettingsStore } from '../store/settingsStore';
-import { toggleAlwaysOnTop, quitApp } from '../lib/tauri';
+import { toggleAlwaysOnTop, quitApp, enterMiniMode, exitMiniMode } from '../lib/tauri';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { SettingsDialog } from './settings/SettingsDialog';
+import { useConversionStore } from '../store/conversionStore';
 
 export function TitleBar() {
   const { alwaysOnTop, setAlwaysOnTop, theme, toggleTheme } = useSettingsStore();
+  const {
+    isMiniMode,
+    savedSize,
+    isClipboardWatching,
+    setMiniMode,
+    setSavedSize,
+    setClipboardWatching,
+  } = useConversionStore();
 
   const handleDragStart = async (e: React.MouseEvent) => {
     // Only drag on left-click on the drag region itself (not buttons)
@@ -44,6 +53,30 @@ export function TitleBar() {
     }
   };
 
+  const handleToggleMiniMode = async () => {
+    try {
+      if (isMiniMode) {
+        // Exit mini mode: restore saved size
+        if (savedSize) {
+          await exitMiniMode(savedSize);
+        }
+        setSavedSize(null);
+        setMiniMode(false);
+      } else {
+        // Enter mini mode: save current size first
+        const size = await enterMiniMode();
+        setSavedSize(size);
+        setMiniMode(true);
+      }
+    } catch (err) {
+      console.error('Failed to toggle mini mode:', err);
+    }
+  };
+
+  const handleToggleClipboardWatch = () => {
+    setClipboardWatching(!isClipboardWatching);
+  };
+
   return (
     <div
       onMouseDown={handleDragStart}
@@ -74,7 +107,31 @@ export function TitleBar() {
             <Moon size={12} className="text-muted-foreground" />
           )}
         </button>
+        {/* Clipboard watch toggle (WINX-06) */}
+        <button
+          onClick={handleToggleClipboardWatch}
+          title={isClipboardWatching ? 'クリップボード監視: ON' : 'クリップボード監視: OFF'}
+          className="p-1 rounded hover:bg-accent transition-colors"
+        >
+          {isClipboardWatching ? (
+            <ClipboardCheck size={12} className="text-primary fill-primary" />
+          ) : (
+            <ClipboardPaste size={12} className="text-muted-foreground" />
+          )}
+        </button>
         <SettingsDialog />
+        {/* Mini mode toggle (WINX-05) */}
+        <button
+          onClick={handleToggleMiniMode}
+          title={isMiniMode ? 'ミニモード解除' : 'ミニモードに切替'}
+          className="p-1 rounded hover:bg-accent transition-colors"
+        >
+          {isMiniMode ? (
+            <Maximize2 size={12} className="text-primary" />
+          ) : (
+            <Minimize2 size={12} className="text-muted-foreground" />
+          )}
+        </button>
         <button
           onClick={handleMinimize}
           className="p-1 rounded hover:bg-accent transition-colors"

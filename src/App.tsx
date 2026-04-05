@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { LogicalSize, LogicalPosition } from '@tauri-apps/api/dpi';
@@ -8,7 +8,9 @@ import { Converter } from './components/Converter';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { DraftBuffer } from './components/DraftBuffer';
 import { useSettingsStore } from './store/settingsStore';
+import { useConversionStore } from './store/conversionStore';
 import { saveWindowState, getWindowState } from './lib/tauri';
+import { useClipboardWatch } from './hooks/useClipboardWatch';
 
 const queryClient = new QueryClient();
 
@@ -22,6 +24,18 @@ function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(fn: T, ms
 
 function App() {
   const theme = useSettingsStore((s) => s.theme);
+  const { isMiniMode, isClipboardWatching, setInput } = useConversionStore();
+
+  // Stable onText callback for clipboard watch
+  const handleClipboardText = useCallback(
+    (text: string) => {
+      setInput(text);
+    },
+    [setInput],
+  );
+
+  // WINX-06: Clipboard watch — enabled when isClipboardWatching is true
+  useClipboardWatch(isClipboardWatching, handleClipboardText);
 
   // Apply theme to document root (D-15)
   useEffect(() => {
@@ -45,9 +59,12 @@ function App() {
   }, []);
 
   // Save window state on move/resize (debounced 500ms)
+  // Skip save when in mini-mode to avoid persisting the reduced size
   useEffect(() => {
     const win = getCurrentWindow();
     const save = debounce(async () => {
+      // Do not overwrite saved size while in mini-mode (WINX-05)
+      if (useConversionStore.getState().isMiniMode) return;
       try {
         const pos = await win.outerPosition();
         const size = await win.outerSize();
@@ -78,8 +95,9 @@ function App() {
         <main className="flex-1 overflow-y-auto">
           <Converter />
         </main>
-        <DraftBuffer />
-        <HistoryDrawer />
+        {/* Hide DraftBuffer and HistoryDrawer in mini-mode (WINX-05) */}
+        {!isMiniMode && <DraftBuffer />}
+        {!isMiniMode && <HistoryDrawer />}
       </div>
       <Toaster position="bottom-center" richColors theme={theme} />
     </QueryClientProvider>

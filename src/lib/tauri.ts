@@ -1,4 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWindow } from '@tauri-apps/api/window';
+import { LogicalSize } from '@tauri-apps/api/dpi';
 
 // --- Types ---
 
@@ -182,6 +184,26 @@ export async function pingProvider(baseUrl: string, apiKey: string | null): Prom
 
 export async function setActiveProvider(providerId: string): Promise<void> {
   return invoke('set_active_provider', { providerId });
+}
+
+// --- Mini Mode (WINX-05) ---
+
+const MINI_HEIGHT = 120; // TitleBar(32px) + textarea(~78px) + padding
+
+export async function enterMiniMode(): Promise<{ width: number; height: number }> {
+  const win = getCurrentWindow();
+  const size = await win.outerSize();
+  // Release minHeight constraint before resizing
+  await win.setMinSize(null);
+  await win.setSize(new LogicalSize(size.width, MINI_HEIGHT));
+  return { width: size.width, height: size.height };
+}
+
+export async function exitMiniMode(savedSize: { width: number; height: number }): Promise<void> {
+  const win = getCurrentWindow();
+  await win.setSize(new LogicalSize(savedSize.width, savedSize.height));
+  // Restore minHeight constraint from tauri.conf.json value
+  await win.setMinSize(new LogicalSize(320, 400));
 }
 
 // --- Copilot Device Flow ---

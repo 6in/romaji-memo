@@ -14,10 +14,13 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
   const [copied, setCopied] = useState(false);
   const addToBuffer = useBufferStore((s) => s.addItem);
   const selectedStyleId = useConversionStore((s) => s.selectedStyleId);
+  const setClipboardIgnoreUntil = useConversionStore((s) => s.setClipboardIgnoreUntil);
 
   const handleCopy = async () => {
     try {
       await writeText(result.converted);
+      // Ignore clipboard watch callbacks for 1 second after self-copy (T-03-03)
+      setClipboardIgnoreUntil(Date.now() + 1000);
       setCopied(true);
       toast.success('Copied!');
       setTimeout(() => setCopied(false), 2000);
