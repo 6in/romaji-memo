@@ -17,6 +17,21 @@ pub fn get_api_key(
     }
 }
 
+/// Delete an API key from OS Keychain.
+pub fn delete_api_key(
+    keychain_lock: &Mutex<()>,
+    provider_id: &str,
+) -> Result<(), String> {
+    let _guard = keychain_lock.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let entry = Entry::new("romaji-memo", provider_id)
+        .map_err(|e| format!("Keychain entry error: {}", e))?;
+    match entry.delete_credential() {
+        Ok(()) => Ok(()),
+        Err(keyring::Error::NoEntry) => Ok(()), // already gone
+        Err(e) => Err(format!("Keychain delete error: {}", e)),
+    }
+}
+
 /// Store an API key in OS Keychain (used by future settings UI).
 pub fn set_api_key(
     keychain_lock: &Mutex<()>,

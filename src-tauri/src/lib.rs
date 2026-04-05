@@ -43,7 +43,21 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::convert::convert,
             commands::history::get_history,
+            commands::history::search_history,
+            commands::history::pin_history,
+            commands::history::delete_history,
+            commands::history::set_history_limit,
+            commands::history::get_history_limit,
             commands::providers::list_providers,
+            commands::providers::get_provider_config,
+            commands::providers::upsert_provider,
+            commands::providers::delete_provider,
+            commands::providers::ping_provider,
+            commands::providers::set_active_provider,
+            commands::styles::list_styles,
+            commands::styles::create_style,
+            commands::styles::update_style,
+            commands::styles::delete_style,
             commands::window::quit_app,
             commands::window::toggle_always_on_top,
             commands::window::save_window_state,
@@ -140,6 +154,7 @@ pub fn run() {
                 db: Arc::new(tokio::sync::Mutex::new(conn)),
                 providers: RwLock::new(providers_map),
                 keychain_lock,
+                app_data_dir: app_data_dir.clone(),
             };
 
             app.manage(app_state);

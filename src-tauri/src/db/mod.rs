@@ -1,4 +1,5 @@
 pub mod conversions;
+pub mod custom_styles;
 pub mod migrations;
 pub mod settings;
 

@@ -8,4 +8,5 @@ pub struct AppState {
     pub db: Arc<tokio::sync::Mutex<Connection>>,
     pub providers: RwLock<HashMap<String, Arc<dyn ProviderAdapter + Send + Sync>>>,
     pub keychain_lock: Mutex<()>,
+    pub app_data_dir: std::path::PathBuf,
 }
