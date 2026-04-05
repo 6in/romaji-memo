@@ -1,4 +1,4 @@
-import { Pin, Sun, Moon, Minus, X, Minimize2, Maximize2, ClipboardCheck, ClipboardPaste } from 'lucide-react';
+import { Pin, Sun, Moon, Minus, X, Minimize2, Maximize2, ClipboardCheck, ClipboardPaste, FileText } from 'lucide-react';
 import { useSettingsStore } from '../store/settingsStore';
 import { toggleAlwaysOnTop, quitApp, enterMiniMode, exitMiniMode } from '../lib/tauri';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -11,9 +11,11 @@ export function TitleBar() {
     isMiniMode,
     savedSize,
     isClipboardWatching,
+    isDocumentMode,
     setMiniMode,
     setSavedSize,
     setClipboardWatching,
+    setDocumentMode,
   } = useConversionStore();
 
   const handleDragStart = async (e: React.MouseEvent) => {
@@ -120,6 +122,18 @@ export function TitleBar() {
           )}
         </button>
         <SettingsDialog />
+        {/* Document mode toggle (CONV-08) */}
+        <button
+          onClick={() => setDocumentMode(!isDocumentMode)}
+          disabled={isMiniMode}
+          title={isDocumentMode ? '長文書モード: ON' : '長文書モード: OFF'}
+          className="p-1 rounded hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <FileText
+            size={12}
+            className={isDocumentMode ? 'text-primary fill-primary' : 'text-muted-foreground'}
+          />
+        </button>
         {/* Mini mode toggle (WINX-05) */}
         <button
           onClick={handleToggleMiniMode}

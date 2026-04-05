@@ -5,6 +5,7 @@ import { LogicalSize, LogicalPosition } from '@tauri-apps/api/dpi';
 import { Toaster } from 'sonner';
 import { TitleBar } from './components/TitleBar';
 import { Converter } from './components/Converter';
+import { DocumentMode } from './components/DocumentMode';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { DraftBuffer } from './components/DraftBuffer';
 import { useSettingsStore } from './store/settingsStore';
@@ -24,7 +25,7 @@ function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(fn: T, ms
 
 function App() {
   const theme = useSettingsStore((s) => s.theme);
-  const { isMiniMode, isClipboardWatching, setInput } = useConversionStore();
+  const { isMiniMode, isClipboardWatching, isDocumentMode, setInput } = useConversionStore();
 
   // Stable onText callback for clipboard watch
   const handleClipboardText = useCallback(
@@ -93,11 +94,12 @@ function App() {
       <div className="h-screen bg-background text-foreground flex flex-col overflow-hidden rounded-lg">
         <TitleBar />
         <main className="flex-1 overflow-y-auto">
-          <Converter />
+          {/* CONV-08: long-document mode replaces Converter */}
+          {isDocumentMode ? <DocumentMode /> : <Converter />}
         </main>
-        {/* Hide DraftBuffer and HistoryDrawer in mini-mode (WINX-05) */}
-        {!isMiniMode && <DraftBuffer />}
-        {!isMiniMode && <HistoryDrawer />}
+        {/* Hide DraftBuffer and HistoryDrawer in mini-mode (WINX-05) or document mode (CONV-08) */}
+        {!isMiniMode && !isDocumentMode && <DraftBuffer />}
+        {!isMiniMode && !isDocumentMode && <HistoryDrawer />}
       </div>
       <Toaster position="bottom-center" richColors theme={theme} />
     </QueryClientProvider>
