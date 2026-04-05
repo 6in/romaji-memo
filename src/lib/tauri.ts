@@ -194,11 +194,14 @@ const MINI_HEIGHT = 120; // TitleBar(32px) + textarea(~78px) + padding
 
 export async function enterMiniMode(): Promise<{ width: number; height: number }> {
   const win = getCurrentWindow();
-  const size = await win.outerSize();
-  // Release minHeight constraint before resizing
+  // outerSize() returns PhysicalSize; divide by scaleFactor to get logical pixels
+  const physSize = await win.outerSize();
+  const scale = await win.scaleFactor();
+  const logWidth = physSize.width / scale;
+  const logHeight = physSize.height / scale;
   await win.setMinSize(null);
-  await win.setSize(new LogicalSize(size.width, MINI_HEIGHT));
-  return { width: size.width, height: size.height };
+  await win.setSize(new LogicalSize(logWidth, MINI_HEIGHT));
+  return { width: logWidth, height: logHeight };
 }
 
 export async function exitMiniMode(savedSize: { width: number; height: number }): Promise<void> {

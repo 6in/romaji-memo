@@ -47,12 +47,11 @@ export function useClipboardWatch(enabled: boolean, onText: (text: string) => vo
 
     (async () => {
       try {
-        // Register text update listener (CrossCopy tauri-plugin-clipboard)
+        // Start background monitor thread first, then register listener
+        stopListeningFn = await startListening();
         const unlistenText = await onTextUpdate((text) => {
           handleText(text);
         });
-        // Start background monitor thread
-        stopListeningFn = await startListening();
         unlistenRef.current = () => {
           unlistenText();
           stopListeningFn?.();
