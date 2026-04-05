@@ -52,7 +52,17 @@ Plans:
   3. User can stock multiple converted texts in a draft buffer, reorder and delete items, and copy all items at once
   4. User can create, edit, and delete custom conversion styles and use them just like built-in presets
   5. User can configure any supported provider (Anthropic, OpenAI-compatible, Copilot), test connectivity, and switch providers from the UI — with Ollama/LM Studio working fully offline
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Rust backend: deps, global shortcut, FTS5 trigram, history/style/provider commands
+- [ ] 02-02-PLAN.md — Frontend contracts: invoke wrappers, bufferStore, hooks extensions
+- [ ] 02-03-PLAN.md — HistoryDrawer UI: search, style filter, pin, delete
+- [ ] 02-04-PLAN.md — DraftBuffer panel with @dnd-kit sortable + ResultDisplay "add to buffer"
+- [ ] 02-05-PLAN.md — SettingsDialog shell + ProviderSettings tab + TitleBar gear icon
+- [ ] 02-06-PLAN.md — StyleManager tab + HistorySettings tab + StyleSelector custom style integration
+- [ ] 02-07-PLAN.md — GitHub Copilot adapter (experimental) + end-to-end verification
+
 **UI hint**: yes
 
 ### Phase 3: Power-User Modes
@@ -73,6 +83,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Conversion Loop | 0/8 | Planned | - |
-| 2. Daily Driver Polish | 0/? | Not started | - |
+| 1. Core Conversion Loop | 8/8 | Complete | - |
+| 2. Daily Driver Polish | 0/7 | Planned | - |
 | 3. Power-User Modes | 0/? | Not started | - |
