@@ -50,3 +50,35 @@ END;
 
 COMMIT;
 ";
+
+pub const MIGRATION_002: &str = "
+BEGIN;
+DROP TRIGGER IF EXISTS conversions_au;
+DROP TRIGGER IF EXISTS conversions_ad;
+DROP TRIGGER IF EXISTS conversions_ai;
+DROP TABLE IF EXISTS conversions_fts;
+
+CREATE VIRTUAL TABLE conversions_fts USING fts5(
+  input, output,
+  content='conversions', content_rowid='id',
+  tokenize='trigram'
+);
+
+INSERT INTO conversions_fts(conversions_fts) VALUES('rebuild');
+
+CREATE TRIGGER conversions_ai AFTER INSERT ON conversions BEGIN
+  INSERT INTO conversions_fts(rowid, input, output)
+  VALUES (new.id, new.input, new.output);
+END;
+CREATE TRIGGER conversions_ad AFTER DELETE ON conversions BEGIN
+  INSERT INTO conversions_fts(conversions_fts, rowid, input, output)
+  VALUES ('delete', old.id, old.input, old.output);
+END;
+CREATE TRIGGER conversions_au AFTER UPDATE ON conversions BEGIN
+  INSERT INTO conversions_fts(conversions_fts, rowid, input, output)
+  VALUES ('delete', old.id, old.input, old.output);
+  INSERT INTO conversions_fts(rowid, input, output)
+  VALUES (new.id, new.input, new.output);
+END;
+COMMIT;
+";

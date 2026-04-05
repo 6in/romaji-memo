@@ -27,5 +27,10 @@ fn run_migrations(conn: &Connection) -> Result<(), rusqlite::Error> {
         conn.execute_batch("PRAGMA user_version = 1;")?;
     }
 
+    if version < 2 {
+        conn.execute_batch(migrations::MIGRATION_002)?;
+        conn.execute_batch("PRAGMA user_version = 2;")?;
+    }
+
     Ok(())
 }

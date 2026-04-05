@@ -17,6 +17,29 @@ use state::AppState;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin({
+            use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+            #[cfg(target_os = "macos")]
+            let shortcut = Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyR);
+            #[cfg(not(target_os = "macos"))]
+            let shortcut = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::KeyR);
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(move |app, registered_shortcut, event| {
+                    if registered_shortcut == &shortcut && event.state() == ShortcutState::Pressed {
+                        if let Some(window) = app.get_webview_window("main") {
+                            match window.is_visible() {
+                                Ok(true) => { let _ = window.hide(); }
+                                _ => {
+                                    let _ = window.show();
+                                    let _ = window.set_focus();
+                                    let _ = window.set_always_on_top(true);
+                                }
+                            }
+                        }
+                    }
+                })
+                .build()
+        })
         .invoke_handler(tauri::generate_handler![
             commands::convert::convert,
             commands::history::get_history,
@@ -120,6 +143,16 @@ pub fn run() {
             };
 
             app.manage(app_state);
+
+            // Register global shortcut: Cmd/Ctrl+Shift+R
+            {
+                use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
+                #[cfg(target_os = "macos")]
+                let shortcut = Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyR);
+                #[cfg(not(target_os = "macos"))]
+                let shortcut = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::KeyR);
+                app.global_shortcut().register(shortcut)?;
+            }
 
             // Restore window position/size from saved settings
             if let Some(window) = app.get_webview_window("main") {
