@@ -1,14 +1,13 @@
 use keyring::Entry;
-use tokio::sync::Mutex;
+use std::sync::Mutex;
 
 /// Retrieve an API key from OS Keychain.
 /// Service name is always "romaji-memo", account is the provider_id.
-/// MUST be called from within spawn_blocking context.
 pub fn get_api_key(
     keychain_lock: &Mutex<()>,
     provider_id: &str,
 ) -> Result<Option<String>, String> {
-    let _guard = keychain_lock.blocking_lock();
+    let _guard = keychain_lock.lock().map_err(|e| format!("Lock error: {}", e))?;
     let entry = Entry::new("romaji-memo", provider_id)
         .map_err(|e| format!("Keychain entry error: {}", e))?;
     match entry.get_password() {
@@ -24,7 +23,7 @@ pub fn set_api_key(
     provider_id: &str,
     api_key: &str,
 ) -> Result<(), String> {
-    let _guard = keychain_lock.blocking_lock();
+    let _guard = keychain_lock.lock().map_err(|e| format!("Lock error: {}", e))?;
     let entry = Entry::new("romaji-memo", provider_id)
         .map_err(|e| format!("Keychain entry error: {}", e))?;
     entry

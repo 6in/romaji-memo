@@ -25,10 +25,11 @@
     ],
     "security": {
       "csp": "default-src 'self' tauri: data: blob: 'unsafe-inline'"
-    }
+    },
+    "macOSPrivateApi": true
   },
   "plugins": {
-    "clipboard-manager": {}
+    "clipboard-manager": null
   },
   "bundle": {
     "active": true,

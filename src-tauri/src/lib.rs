@@ -7,7 +7,8 @@ mod state;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tauri::Manager;
-use tokio::sync::{Mutex, RwLock};
+use std::sync::Mutex;
+use tokio::sync::RwLock;
 
 use providers::ProviderAdapter;
 use state::AppState;
@@ -112,7 +113,7 @@ pub fn run() {
             }
 
             let app_state = AppState {
-                db: Arc::new(Mutex::new(conn)),
+                db: Arc::new(tokio::sync::Mutex::new(conn)),
                 providers: RwLock::new(providers_map),
                 keychain_lock,
             };
