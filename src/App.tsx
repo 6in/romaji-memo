@@ -67,9 +67,16 @@ function App() {
       // Do not overwrite saved size while in mini-mode (WINX-05)
       if (useConversionStore.getState().isMiniMode) return;
       try {
+        const scale = await win.scaleFactor();
         const pos = await win.outerPosition();
         const size = await win.outerSize();
-        await saveWindowState(pos.x, pos.y, size.width, size.height);
+        // Convert physical pixels to logical before persisting
+        await saveWindowState(
+          pos.x / scale,
+          pos.y / scale,
+          size.width / scale,
+          size.height / scale,
+        );
       } catch (err) {
         console.error('Failed to save window state:', err);
       }
