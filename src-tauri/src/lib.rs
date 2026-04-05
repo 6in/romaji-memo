@@ -54,6 +54,8 @@ pub fn run() {
             commands::providers::delete_provider,
             commands::providers::ping_provider,
             commands::providers::set_active_provider,
+            commands::providers::start_copilot_auth,
+            commands::providers::poll_copilot_auth,
             commands::styles::list_styles,
             commands::styles::create_style,
             commands::styles::update_style,
@@ -137,6 +139,19 @@ pub fn run() {
                             key,
                             p.model.clone(),
                         ))
+                    }
+                    "copilot" => {
+                        let key = match api_key {
+                            Some(k) => k,
+                            None => {
+                                eprintln!(
+                                    "[romaji-memo] Warning: No OAuth token for Copilot '{}'. Use settings UI to authenticate.",
+                                    p.id
+                                );
+                                continue;
+                            }
+                        };
+                        Arc::new(providers::copilot::CopilotAdapter::new(key, p.model.clone()))
                     }
                     other => {
                         eprintln!(
