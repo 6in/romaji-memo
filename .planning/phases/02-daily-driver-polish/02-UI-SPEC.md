@@ -56,12 +56,12 @@ Source: Phase 1 codebase (`HistoryDrawer.tsx`, `TitleBar.tsx`, `Converter.tsx`) 
 
 ## Typography
 
-| Role | Size | Weight | Line Height |
-|------|------|--------|-------------|
-| Body | 14px (text-sm) | 400 (regular) | 1.5 |
-| Label | 12px (text-xs) | 500 (medium) | 1.4 |
-| Heading (dialog/section) | 16px (text-base) | 600 (semibold) | 1.2 |
-| Monospace (API key, URL field) | 12px (text-xs font-mono) | 400 (regular) | 1.5 |
+| Role | Size | Weight | Line Height | Tailwind Classes |
+|------|------|--------|-------------|-----------------|
+| Body | 14px (text-sm) | 400 (regular) | 1.5 | `text-sm font-normal` |
+| Label | 12px (text-xs) | 600 (semibold) | 1.4 | `font-semibold text-xs` |
+| Heading (dialog/section) | 16px (text-base) | 600 (semibold) | 1.2 | `text-base font-semibold` |
+| Monospace (API key, URL field) | 12px (text-xs font-mono) | 400 (regular) | 1.5 | `text-xs font-mono` |
 
 Notes:
 - Phase 1 uses `text-sm` (14px) as the dominant body size throughout — maintain in Phase 2.
@@ -69,6 +69,7 @@ Notes:
 - Headings appear only in SettingsDialog tab titles and section headers; use `text-base font-semibold`.
 - API key and base URL inputs use `font-mono` to visually distinguish sensitive/technical values.
 - No display-size text (20px+) in Phase 2 — this is a compact utility app, not a marketing page.
+- **Weight system: 2 weights only — regular (400) for Body/Monospace, semibold (600) for Label/Heading.**
 
 Source: Phase 1 codebase patterns (`HistoryDrawer.tsx`, `Converter.tsx`, `TitleBar.tsx`).
 
@@ -151,7 +152,7 @@ Existing component extended with:
 #### HistorySettings tab ("全般" tab)
 
 - History limit input: labeled "履歴の保存件数" + number input (right-aligned, 80px wide); suffix label "件"; default 1000
-- Save button: `bg-primary text-primary-foreground text-xs px-4 py-1.5 rounded-md`
+- Save button: `bg-primary text-primary-foreground text-xs px-4 py-1.5 rounded-md`; label: "設定を保存"
 
 ---
 
@@ -201,7 +202,7 @@ Existing component extended with:
 | Primary CTA — Connect test | "接続テスト" |
 | Primary CTA — Add to buffer | "バッファに追加" (button label on ResultDisplay copy area, added in Phase 2) |
 | Primary CTA — Copy all buffer | "全コピー (N件)" |
-| Primary CTA — Save settings | "保存" |
+| Primary CTA — Save settings | "設定を保存" |
 | Primary CTA — Add provider | "プロバイダーを追加" |
 | Primary CTA — Add style | "スタイルを追加" |
 | Empty state — HistoryDrawer (no history) | Heading: "履歴がありません" / Body: "変換すると、ここに表示されます。" |
