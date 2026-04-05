@@ -73,7 +73,13 @@ Plans:
   1. User can switch to long-document mode, convert text paragraph-by-paragraph, see all accumulated results, and export the full document as .md or .txt
   2. User can enable clipboard watch mode and have text copied elsewhere automatically appear in the input field
   3. User can switch to mini-mode showing only the input field, then return to full view
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Rust/JS プラグイン追加 + ミニモード + クリップボード監視
+- [ ] 03-02-PLAN.md — 長文書モード UI + documentStore + エクスポート
+- [ ] 03-03-PLAN.md — Phase 3 統合検証 (human-verify)
+
 **UI hint**: yes
 
 ## Progress
@@ -85,4 +91,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Core Conversion Loop | 8/8 | Complete | - |
 | 2. Daily Driver Polish | 7/7 | Complete   | 2026-04-05 |
-| 3. Power-User Modes | 0/? | Not started | - |
+| 3. Power-User Modes | 0/3 | Not started | - |
