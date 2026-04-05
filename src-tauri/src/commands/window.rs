@@ -3,6 +3,7 @@
 #[tauri::command]
 pub async fn quit_app(app_handle: tauri::AppHandle) {
     app_handle.exit(0);
+    std::process::exit(0);
 }
 
 /// Toggle the always-on-top state of the main window.

@@ -141,11 +141,6 @@ pub fn run() {
                 let _ = window.set_visible_on_all_workspaces(true);
             }
 
-            // macOS: set activation policy to Accessory so the app doesn't appear in the Dock
-            // or steal focus from other apps when launched.
-            #[cfg(target_os = "macos")]
-            let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-
             Ok(())
         })
         .run(tauri::generate_context!())
