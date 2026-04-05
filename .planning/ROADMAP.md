@@ -13,7 +13,7 @@ Romaji Memo ships in three phases. Phase 1 builds the complete end-to-end conver
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Core Conversion Loop** - Working floating utility: romaji in, AI output, one-click copy, persistent history, two providers, OS Keychain, always-on-top
-- [ ] **Phase 2: Daily Driver Polish** - Global hotkey, history search/pin, draft buffer, custom styles, Copilot adapter, full settings UI, window persistence
+- [x] **Phase 2: Daily Driver Polish** - Global hotkey, history search/pin, draft buffer, custom styles, Copilot adapter, full settings UI, window persistence (completed 2026-04-05)
 - [ ] **Phase 3: Power-User Modes** - Long-document mode with export, clipboard watch, mini-mode, history management settings
 
 ## Phase Details
@@ -55,13 +55,13 @@ Plans:
 **Plans**: 7 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Rust backend: deps, global shortcut, FTS5 trigram, history/style/provider commands
-- [ ] 02-02-PLAN.md — Frontend contracts: invoke wrappers, bufferStore, hooks extensions
-- [ ] 02-03-PLAN.md — HistoryDrawer UI: search, style filter, pin, delete
-- [ ] 02-04-PLAN.md — DraftBuffer panel with @dnd-kit sortable + ResultDisplay "add to buffer"
-- [ ] 02-05-PLAN.md — SettingsDialog shell + ProviderSettings tab + TitleBar gear icon
-- [ ] 02-06-PLAN.md — StyleManager tab + HistorySettings tab + StyleSelector custom style integration
-- [ ] 02-07-PLAN.md — GitHub Copilot adapter (experimental) + end-to-end verification
+- [x] 02-01-PLAN.md — Rust backend: deps, global shortcut, FTS5 trigram, history/style/provider commands
+- [x] 02-02-PLAN.md — Frontend contracts: invoke wrappers, bufferStore, hooks extensions
+- [x] 02-03-PLAN.md — HistoryDrawer UI: search, style filter, pin, delete
+- [x] 02-04-PLAN.md — DraftBuffer panel with @dnd-kit sortable + ResultDisplay "add to buffer"
+- [x] 02-05-PLAN.md — SettingsDialog shell + ProviderSettings tab + TitleBar gear icon
+- [x] 02-06-PLAN.md — StyleManager tab + HistorySettings tab + StyleSelector custom style integration
+- [x] 02-07-PLAN.md — GitHub Copilot adapter (experimental) + end-to-end verification
 
 **UI hint**: yes
 
@@ -84,5 +84,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Conversion Loop | 8/8 | Complete | - |
-| 2. Daily Driver Polish | 0/7 | Planned | - |
+| 2. Daily Driver Polish | 7/7 | Complete   | 2026-04-05 |
 | 3. Power-User Modes | 0/? | Not started | - |

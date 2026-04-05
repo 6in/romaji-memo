@@ -40,7 +40,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **PROV-01**: User can use Anthropic API (Claude) as conversion provider
 - [ ] **PROV-02**: User can use OpenAI-compatible APIs (OpenAI/Ollama/OpenRouter/LM Studio) as conversion provider
-- [ ] **PROV-03**: User can use GitHub Copilot as conversion provider via Device Flow OAuth
+- [x] **PROV-03**: User can use GitHub Copilot as conversion provider via Device Flow OAuth
 - [ ] **PROV-04**: User can switch between providers from the UI
 - [ ] **PROV-05**: User can configure provider settings (API key, base URL, model) in a settings screen
 - [ ] **PROV-06**: User can test provider connectivity from the settings screen
@@ -114,7 +114,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUFF-04 | Phase 2 | Pending |
 | PROV-01 | Phase 1 | Pending |
 | PROV-02 | Phase 1 | Pending |
-| PROV-03 | Phase 2 | Pending |
+| PROV-03 | Phase 2 | Complete |
 | PROV-04 | Phase 1 | Pending |
 | PROV-05 | Phase 2 | Pending |
 | PROV-06 | Phase 2 | Pending |
