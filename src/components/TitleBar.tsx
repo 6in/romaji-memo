@@ -4,6 +4,7 @@ import { toggleAlwaysOnTop, quitApp, enterMiniMode, exitMiniMode, newConversatio
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { SettingsDialog } from './settings/SettingsDialog';
 import { useConversionStore } from '../store/conversionStore';
+import { useDocumentStore } from '../store/documentStore';
 
 export function TitleBar() {
   const { alwaysOnTop, setAlwaysOnTop, theme, toggleTheme } = useSettingsStore();
@@ -16,7 +17,11 @@ export function TitleBar() {
     setSavedSize,
     setClipboardWatching,
     setDocumentMode,
+    setInput,
+    setResult,
+    setEditedResult,
   } = useConversionStore();
+  const clearDocument = useDocumentStore((s) => s.clearDocument);
 
   const handleDragStart = async (e: React.MouseEvent) => {
     // Only drag on left-click on the drag region itself (not buttons)
@@ -124,7 +129,16 @@ export function TitleBar() {
         {/* 新しい会話ボタン — コンテキストリセット */}
         <button
           onClick={async () => {
-            try { await newConversation(); } catch (err) { console.error('Failed to start new conversation:', err); }
+            try {
+              await newConversation();
+              // フロントエンドのステートもクリア
+              clearDocument();
+              setInput('');
+              setResult(null);
+              setEditedResult(null);
+            } catch (err) {
+              console.error('Failed to start new conversation:', err);
+            }
           }}
           title="新しい会話（コンテキストリセット）"
           className="p-1 rounded hover:bg-accent transition-colors"
