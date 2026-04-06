@@ -131,7 +131,7 @@ async fn prompt_spike_segmentation() {
         return;
     };
 
-    let system = build_system_prompt("standard");
+    let system = build_system_prompt("standard", &[]);
     let mut pass_count = 0usize;
     let mut results: Vec<(String, String, String, bool)> = Vec::new();
 
