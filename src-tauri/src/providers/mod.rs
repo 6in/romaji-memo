@@ -85,6 +85,13 @@ pub trait ProviderAdapter: Send + Sync {
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 /// Strip markdown code fences from LLM output and parse as ConvertOutput JSON.
+///
+/// Handles two cases:
+/// 1. Single object: `{"converted":"...","intent":"...","typo":"..."}`
+/// 2. Array of objects: `[{"converted":"...","intent":"...","typo":""},...]`
+///    — occurs when a long multi-paragraph text is passed to the convert command.
+///    In this case the `converted` fields are joined with `\n\n` and the first
+///    non-empty `intent` / `typo` values are used.
 pub fn extract_json(raw: &str) -> Result<ConvertOutput, ProviderError> {
     let cleaned = raw
         .trim()
@@ -92,13 +99,39 @@ pub fn extract_json(raw: &str) -> Result<ConvertOutput, ProviderError> {
         .trim_start_matches("```")
         .trim_end_matches("```")
         .trim();
-    serde_json::from_str(cleaned).map_err(|e| {
-        ProviderError::Parse(format!(
-            "JSON parse failed: {}. Raw: {}",
-            e,
-            &raw[..raw.len().min(200)]
-        ))
-    })
+
+    // First, try parsing as a single ConvertOutput object (the common case).
+    if let Ok(output) = serde_json::from_str::<ConvertOutput>(cleaned) {
+        return Ok(output);
+    }
+
+    // If that fails, try parsing as an array and merge the results.
+    if let Ok(items) = serde_json::from_str::<Vec<ConvertOutput>>(cleaned) {
+        if !items.is_empty() {
+            let converted = items
+                .iter()
+                .map(|i| i.converted.as_str())
+                .collect::<Vec<_>>()
+                .join("\n\n");
+            let intent = items
+                .iter()
+                .find(|i| !i.intent.is_empty())
+                .map(|i| i.intent.clone())
+                .unwrap_or_default();
+            let typo = items
+                .iter()
+                .find(|i| !i.typo.is_empty())
+                .map(|i| i.typo.clone())
+                .unwrap_or_default();
+            return Ok(ConvertOutput { converted, intent, typo });
+        }
+    }
+
+    // Neither worked — return the original parse error for diagnostics.
+    Err(ProviderError::Parse(format!(
+        "JSON parse failed: unexpected format. Raw: {}",
+        &raw[..raw.len().min(200)]
+    )))
 }
 
 /// Embedded default providers config (used as fallback when providers.json is absent).
