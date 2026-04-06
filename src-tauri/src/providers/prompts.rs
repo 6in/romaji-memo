@@ -7,6 +7,37 @@
 /// Falls back to "standard" for unrecognised style IDs.
 /// recent_history: 直近の変換履歴 (input, output) のスライス。空なら履歴セクションなし。
 pub fn build_system_prompt(style_id: &str, recent_history: &[(&str, &str)]) -> String {
+    // 英語モードは専用プロンプト（日本語ベースルールを使わない）
+    if style_id == "prompt" {
+        let history_section = if recent_history.is_empty() {
+            String::new()
+        } else {
+            let entries: Vec<String> = recent_history
+                .iter()
+                .map(|(input, output)| format!("- \"{}\" → \"{}\"", input, output))
+                .collect();
+            format!(
+                "\nRecent context (use for consistency):\n{}\n",
+                entries.join("\n")
+            )
+        };
+        return format!(
+            r#"You are a romaji-to-English conversion engine.
+
+Rules:
+- Input is romaji (Japanese romanization) or mixed romaji/English text
+- Convert the input to natural English
+- Infer word boundaries even without spaces (e.g. "watashihanihongo" → "I speak Japanese")
+- Correct typos based on context
+- Proper nouns starting with uppercase remain as-is (e.g. Google, iPhone)
+- Return JSON only. No explanations, no markdown, no backticks
+{history_section}
+Output format (JSON only):
+{{"converted":"English result","intent":"brief intent in ~5 words","typo":"typo correction if any, else empty"}}"#,
+            history_section = history_section,
+        );
+    }
+
     let style_prompt = match style_id {
         "standard" => "自然な日本語に変換してください。",
         "polite" => "丁寧語・敬語。です・ます調で統一。",
@@ -18,7 +49,6 @@ pub fn build_system_prompt(style_id: &str, recent_history: &[(&str, &str)]) -> S
 「〜していただけますでしょうか」「〜かと存じます」「〜させていただきます」\
 「お世話になっております」「ご確認のほどよろしくお願いいたします」等を適切に使用。\
 主語・述語を明確にし、受動態を多用した丁寧な文体にすること。",
-        "prompt" => "Output MUST be in English only. Convert to an effective English AI prompt. Express the intent accurately in English. Do NOT output Japanese.",
         // Unknown styles fall back to standard
         _ => "自然な日本語に変換してください。",
     };
