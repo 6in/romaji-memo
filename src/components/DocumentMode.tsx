@@ -33,6 +33,16 @@ export function DocumentMode() {
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
+  // 段落リスト末尾のスクロールターゲット
+  const scrollEndRef = useRef<HTMLDivElement>(null);
+
+  // 段落が追加されたときに最下部へスクロール (編集時はスクロールしない)
+  useEffect(() => {
+    if (paragraphs.length > 0) {
+      scrollEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [paragraphs.length]);
+
   // 変換実行前に入力を保存
   const handleConvert = () => {
     pendingInputRef.current = input.trim();
@@ -304,6 +314,8 @@ export function DocumentMode() {
                 </div>
               </div>
             ))}
+            {/* 自動スクロール用ターゲット */}
+            <div ref={scrollEndRef} />
           </div>
         )}
       </div>
