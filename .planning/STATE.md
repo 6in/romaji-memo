@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 Phase: 03 (power-user-modes) — EXECUTING
 Plan: 1 of 3
 Status: Executing Phase 03
-Last activity: 2026-04-05 -- Phase 03 execution started
+Last activity: 2026-04-06 - Completed quick task 260406-f4i: 変換精度向上のため直近履歴をプロンプトに含める＋ストッパー機能で会話コンテキストをリセット
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -69,6 +69,12 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260406-f4i | 変換精度向上のため直近履歴をプロンプトに含める＋ストッパー機能で会話コンテキストをリセット | 2026-04-06 | a7586d7 | [260406-f4i-history-context-features](./quick/260406-f4i-history-context-features/) |
 
 ### Blockers/Concerns
 
