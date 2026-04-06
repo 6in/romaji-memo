@@ -32,6 +32,39 @@ pub fn insert_conversion(
     Ok(conn.last_insert_rowid())
 }
 
+/// ストッパーレコードを挿入する（新しい会話の区切り）
+pub fn insert_stopper(conn: &Connection) -> Result<i64, rusqlite::Error> {
+    conn.execute(
+        "INSERT INTO conversions (input, output, style_id, provider_id, model, is_stopper) VALUES ('', '', '', '', '', 1)",
+        [],
+    )?;
+    Ok(conn.last_insert_rowid())
+}
+
+/// 直近のストッパー以降の変換履歴を最大 limit 件取得する。
+/// 各エントリの input/output は先頭50文字で切る。
+/// ストッパーレコード自体は結果に含まない。
+pub fn get_recent_context(conn: &Connection, limit: i64) -> Result<Vec<(String, String)>, rusqlite::Error> {
+    let mut stmt = conn.prepare(
+        "SELECT input, output FROM conversions
+         WHERE is_stopper = 0
+           AND id > COALESCE((SELECT MAX(id) FROM conversions WHERE is_stopper = 1), 0)
+         ORDER BY id DESC
+         LIMIT ?1"
+    )?;
+    let rows = stmt.query_map(rusqlite::params![limit], |row| {
+        let input: String = row.get(0)?;
+        let output: String = row.get(1)?;
+        // 先頭50文字で切る
+        let input_trimmed: String = input.chars().take(50).collect();
+        let output_trimmed: String = output.chars().take(50).collect();
+        Ok((input_trimmed, output_trimmed))
+    })?;
+    let mut results: Vec<(String, String)> = rows.collect::<Result<Vec<_>, _>>()?;
+    results.reverse(); // 古い順にする（プロンプト表示用）
+    Ok(results)
+}
+
 pub fn get_history(
     conn: &Connection,
     limit: i64,
@@ -40,13 +73,13 @@ pub fn get_history(
 ) -> Result<Vec<ConversionRecord>, rusqlite::Error> {
     if let Some(style) = style_filter {
         let mut stmt = conn.prepare(
-            "SELECT id, input, output, style_id, intent, typo, provider_id, model, pinned, created_at FROM conversions WHERE style_id = ?1 ORDER BY pinned DESC, created_at DESC LIMIT ?2 OFFSET ?3",
+            "SELECT id, input, output, style_id, intent, typo, provider_id, model, pinned, created_at FROM conversions WHERE is_stopper = 0 AND style_id = ?1 ORDER BY pinned DESC, created_at DESC LIMIT ?2 OFFSET ?3",
         )?;
         let rows = stmt.query_map(rusqlite::params![style, limit, offset], map_row)?;
         rows.collect()
     } else {
         let mut stmt = conn.prepare(
-            "SELECT id, input, output, style_id, intent, typo, provider_id, model, pinned, created_at FROM conversions ORDER BY pinned DESC, created_at DESC LIMIT ?1 OFFSET ?2",
+            "SELECT id, input, output, style_id, intent, typo, provider_id, model, pinned, created_at FROM conversions WHERE is_stopper = 0 ORDER BY pinned DESC, created_at DESC LIMIT ?1 OFFSET ?2",
         )?;
         let rows = stmt.query_map(rusqlite::params![limit, offset], map_row)?;
         rows.collect()
@@ -67,7 +100,7 @@ pub fn search_history(
             let mut stmt = conn.prepare(
                 "SELECT id, input, output, style_id, intent, typo, provider_id, model, pinned, created_at
                  FROM conversions
-                 WHERE (input LIKE ?1 OR output LIKE ?1) AND style_id = ?2
+                 WHERE is_stopper = 0 AND (input LIKE ?1 OR output LIKE ?1) AND style_id = ?2
                  ORDER BY pinned DESC, created_at DESC
                  LIMIT ?3 OFFSET ?4"
             )?;
@@ -77,7 +110,7 @@ pub fn search_history(
             let mut stmt = conn.prepare(
                 "SELECT id, input, output, style_id, intent, typo, provider_id, model, pinned, created_at
                  FROM conversions
-                 WHERE input LIKE ?1 OR output LIKE ?1
+                 WHERE is_stopper = 0 AND (input LIKE ?1 OR output LIKE ?1)
                  ORDER BY pinned DESC, created_at DESC
                  LIMIT ?2 OFFSET ?3"
             )?;
@@ -92,7 +125,7 @@ pub fn search_history(
                         c.provider_id, c.model, c.pinned, c.created_at
                  FROM conversions c
                  JOIN conversions_fts f ON f.rowid = c.id
-                 WHERE f.conversions_fts MATCH ?1 AND c.style_id = ?2
+                 WHERE c.is_stopper = 0 AND f.conversions_fts MATCH ?1 AND c.style_id = ?2
                  ORDER BY c.pinned DESC, c.created_at DESC
                  LIMIT ?3 OFFSET ?4"
             )?;
@@ -104,7 +137,7 @@ pub fn search_history(
                         c.provider_id, c.model, c.pinned, c.created_at
                  FROM conversions c
                  JOIN conversions_fts f ON f.rowid = c.id
-                 WHERE f.conversions_fts MATCH ?1
+                 WHERE c.is_stopper = 0 AND f.conversions_fts MATCH ?1
                  ORDER BY c.pinned DESC, c.created_at DESC
                  LIMIT ?2 OFFSET ?3"
             )?;
