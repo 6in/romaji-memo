@@ -1,6 +1,6 @@
-import { Pin, Sun, Moon, Minus, X, Minimize2, Maximize2, ClipboardCheck, ClipboardPaste, FileText } from 'lucide-react';
+import { Pin, Sun, Moon, Minus, X, Minimize2, Maximize2, ClipboardCheck, ClipboardPaste, FileText, MessageSquarePlus } from 'lucide-react';
 import { useSettingsStore } from '../store/settingsStore';
-import { toggleAlwaysOnTop, quitApp, enterMiniMode, exitMiniMode } from '../lib/tauri';
+import { toggleAlwaysOnTop, quitApp, enterMiniMode, exitMiniMode, newConversation } from '../lib/tauri';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { SettingsDialog } from './settings/SettingsDialog';
 import { useConversionStore } from '../store/conversionStore';
@@ -120,6 +120,16 @@ export function TitleBar() {
           ) : (
             <ClipboardPaste size={12} className="text-muted-foreground" />
           )}
+        </button>
+        {/* 新しい会話ボタン — コンテキストリセット */}
+        <button
+          onClick={async () => {
+            try { await newConversation(); } catch (err) { console.error('Failed to start new conversation:', err); }
+          }}
+          title="新しい会話（コンテキストリセット）"
+          className="p-1 rounded hover:bg-accent transition-colors"
+        >
+          <MessageSquarePlus size={12} className="text-muted-foreground" />
         </button>
         <SettingsDialog />
         {/* Document mode toggle (CONV-08) */}
