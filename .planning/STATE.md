@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 Phase: 03 (power-user-modes) — EXECUTING
 Plan: 1 of 3
 Status: Executing Phase 03
-Last activity: 2026-04-06 - Completed quick task 260406-f4i: 変換精度向上のため直近履歴をプロンプトに含める＋ストッパー機能で会話コンテキストをリセット
+Last activity: 2026-04-06 - Completed quick task 260406-gc8: 超文書モードで変換テキスト追加時に自動スクロール・新規会話ボタンでテキストクリア
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -75,6 +75,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260406-f4i | 変換精度向上のため直近履歴をプロンプトに含める＋ストッパー機能で会話コンテキストをリセット | 2026-04-06 | a7586d7 | [260406-f4i-history-context-features](./quick/260406-f4i-history-context-features/) |
+| 260406-gc8 | 超文書モードで変換テキスト追加時に自動スクロール・新規会話ボタンでテキストクリア | 2026-04-06 | e931e5a | [260406-gc8-document-mode-auto-scroll-clear](./quick/260406-gc8-document-mode-auto-scroll-clear/) |
 
 ### Blockers/Concerns
 
