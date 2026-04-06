@@ -1,17 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
-import { Loader2, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Loader2, Trash2, ChevronDown, ChevronRight, Copy, ArrowLeft, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { useDocumentStore } from '../store/documentStore';
 import { useConversionStore } from '../store/conversionStore';
-import { exportDocument } from '../lib/tauri';
+import { useSettingsStore } from '../store/settingsStore';
+import { exportDocument, convertText } from '../lib/tauri';
 import { useConvert } from '../hooks/useConvert';
 import { StyleSelector } from './StyleSelector';
 
 export function DocumentMode() {
-  const { paragraphs, appendParagraph, removeParagraph, clearDocument, getExportContent } =
-    useDocumentStore();
+  const {
+    paragraphs,
+    previewText,
+    appendParagraph,
+    removeParagraph,
+    updateParagraph,
+    clearDocument,
+    getExportContent,
+    setPreviewText,
+  } = useDocumentStore();
   const { input, setInput, result, loading, selectedStyleId } = useConversionStore();
+  const activeProviderId = useSettingsStore((s) => s.activeProviderId);
   const { runConvert } = useConvert();
+
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   // 変換成功の検出: result が変化したときに段落を追加する
   const prevResultRef = useRef(result);
@@ -72,6 +85,118 @@ export function DocumentMode() {
     });
   };
 
+  // プレビューモードを開く: 全段落を結合
+  const handleOpenPreview = () => {
+    const combined = paragraphs.map((p) => p.output).join('\n\n');
+    setPreviewText(combined);
+  };
+
+  // プレビューからクリップボードにコピー
+  const handleCopyPreview = async () => {
+    if (!previewText) return;
+    try {
+      await writeText(previewText);
+      toast.success('コピーしました');
+    } catch {
+      toast.error('コピーに失敗しました');
+    }
+  };
+
+  // プレビューに口調変換をかける
+  const handleConvertPreview = async () => {
+    if (!previewText?.trim()) return;
+    setPreviewLoading(true);
+    try {
+      const result = await convertText(previewText, selectedStyleId, activeProviderId);
+      setPreviewText(result.converted);
+      toast.success('変換しました');
+    } catch (err) {
+      const msg = typeof err === 'string' ? err : '変換に失敗しました';
+      toast.error(msg);
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  // --- プレビュービュー ---
+  if (previewText !== null) {
+    return (
+      <div className="flex flex-col h-full">
+        {/* ヘッダー */}
+        <div className="flex items-center justify-between px-3 py-2 border-b border-border shrink-0">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPreviewText(null)}
+              className="p-1 rounded hover:bg-accent transition-colors"
+              title="段落ビューに戻る"
+            >
+              <ArrowLeft size={12} className="text-muted-foreground" />
+            </button>
+            <span className="text-xs font-semibold text-foreground">プレビュー</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleCopyPreview}
+              className="flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-border bg-muted hover:bg-accent transition-colors"
+              title="クリップボードにコピー"
+            >
+              <Copy size={10} />
+              コピー
+            </button>
+            <div className="relative group">
+              <button className="text-xs px-2 py-1 rounded-md border border-border bg-muted hover:bg-accent transition-colors">
+                エクスポート ▾
+              </button>
+              <div className="absolute right-0 top-full mt-1 bg-background border border-border rounded-md shadow-md z-10 hidden group-hover:block min-w-max">
+                <button
+                  onClick={() => handleExport('md')}
+                  className="block w-full text-left text-xs px-3 py-2 hover:bg-accent transition-colors"
+                >
+                  .md でエクスポート
+                </button>
+                <button
+                  onClick={() => handleExport('txt')}
+                  className="block w-full text-left text-xs px-3 py-2 hover:bg-accent transition-colors"
+                >
+                  .txt でエクスポート
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* プレビュー textarea */}
+        <div className="flex-1 overflow-hidden p-3">
+          <textarea
+            value={previewText}
+            onChange={(e) => setPreviewText(e.target.value)}
+            className="w-full h-full resize-none rounded-md p-3 bg-muted text-foreground text-sm border border-border focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </div>
+
+        {/* 口調変換エリア */}
+        <div className="flex flex-col gap-2 p-3 border-t border-border shrink-0">
+          <StyleSelector />
+          <button
+            onClick={handleConvertPreview}
+            disabled={previewLoading || !previewText.trim()}
+            className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2"
+          >
+            {previewLoading ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                変換中...
+              </>
+            ) : (
+              '全文を口調変換'
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- 段落リストビュー ---
   return (
     <div className="flex flex-col h-full">
       {/* ヘッダー */}
@@ -83,6 +208,16 @@ export function DocumentMode() {
           </span>
         </span>
         <div className="flex items-center gap-1">
+          {/* プレビューボタン */}
+          <button
+            onClick={handleOpenPreview}
+            disabled={paragraphs.length === 0}
+            className="flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-border bg-muted hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            title="全文プレビュー"
+          >
+            <Eye size={10} />
+            プレビュー
+          </button>
           {/* エクスポートドロップダウン */}
           <div className="relative group">
             <button
@@ -133,8 +268,13 @@ export function DocumentMode() {
               <div key={p.id} className="group px-3 py-2">
                 <div className="flex items-start gap-2">
                   <div className="flex-1 min-w-0">
-                    {/* 変換結果テキスト */}
-                    <p className="text-xs text-foreground break-words">{p.output}</p>
+                    {/* 変換結果テキスト (インライン編集) */}
+                    <textarea
+                      value={p.output}
+                      onChange={(e) => updateParagraph(p.id, e.target.value)}
+                      rows={Math.max(2, p.output.split('\n').length)}
+                      className="w-full resize-none rounded-sm px-1 py-0.5 bg-transparent text-xs text-foreground border border-transparent hover:border-border focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                    />
                     {/* 入力テキスト (折りたたみ) */}
                     <button
                       onClick={() => toggleExpand(p.id)}
@@ -156,7 +296,7 @@ export function DocumentMode() {
                   {/* 削除ボタン */}
                   <button
                     onClick={() => removeParagraph(p.id)}
-                    className="p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    className="p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
                     aria-label="段落を削除"
                   >
                     <Trash2 size={12} className="text-muted-foreground hover:text-destructive" />

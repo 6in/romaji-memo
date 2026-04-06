@@ -10,14 +10,18 @@ export interface DocumentParagraph {
 
 interface DocumentStore {
   paragraphs: DocumentParagraph[];
+  previewText: string | null;
   appendParagraph: (input: string, output: string, styleId: string) => void;
   removeParagraph: (id: string) => void;
+  updateParagraph: (id: string, output: string) => void;
   clearDocument: () => void;
+  setPreviewText: (text: string | null) => void;
   getExportContent: (format: 'md' | 'txt') => string;
 }
 
 export const useDocumentStore = create<DocumentStore>((set, get) => ({
   paragraphs: [],
+  previewText: null,
 
   appendParagraph: (input, output, styleId) =>
     set((s) => ({
@@ -30,7 +34,14 @@ export const useDocumentStore = create<DocumentStore>((set, get) => ({
   removeParagraph: (id) =>
     set((s) => ({ paragraphs: s.paragraphs.filter((p) => p.id !== id) })),
 
-  clearDocument: () => set({ paragraphs: [] }),
+  updateParagraph: (id, output) =>
+    set((s) => ({
+      paragraphs: s.paragraphs.map((p) => (p.id === id ? { ...p, output } : p)),
+    })),
+
+  clearDocument: () => set({ paragraphs: [], previewText: null }),
+
+  setPreviewText: (text) => set({ previewText: text }),
 
   getExportContent: (format) => {
     const { paragraphs } = get();
