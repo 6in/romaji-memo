@@ -37,10 +37,24 @@ pub async fn convert(
     };
     // Lock is dropped here — safe to await below
 
-    // 2. Build system prompt on Rust side (style_id validated; unknown → standard fallback)
-    let system = crate::providers::prompts::build_system_prompt(&style_id);
+    // 2. Fetch recent context from DB (spawn_blocking — never block async runtime with rusqlite)
+    let db_ctx = state.db.clone();
+    let recent_context = tokio::task::spawn_blocking(move || {
+        let conn = db_ctx.blocking_lock();
+        crate::db::conversions::get_recent_context(&conn, 10)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+    .map_err(|e| e.to_string())?;
 
-    // 3. Create CompletionRequest using the adapter's model
+    // 3. Build system prompt on Rust side (style_id validated; unknown → standard fallback)
+    let history_refs: Vec<(&str, &str)> = recent_context
+        .iter()
+        .map(|(i, o)| (i.as_str(), o.as_str()))
+        .collect();
+    let system = crate::providers::prompts::build_system_prompt(&style_id, &history_refs);
+
+    // 4. Create CompletionRequest using the adapter's model
     let model = provider.model_id().to_string();
     let req = crate::providers::CompletionRequest {
         system,

@@ -233,6 +233,12 @@ export async function pollCopilotAuth(
   return invoke('poll_copilot_auth', { deviceCode, interval, providerId });
 }
 
+// --- Conversation Context (履歴ストッパー) ---
+
+export function newConversation(): Promise<void> {
+  return invoke('new_conversation');
+}
+
 // --- Document Export (CONV-08) ---
 
 export async function exportDocument(content: string, format: 'md' | 'txt'): Promise<boolean> {

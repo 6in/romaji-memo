@@ -5,7 +5,8 @@
 
 /// Build the full system prompt for the given style_id.
 /// Falls back to "standard" for unrecognised style IDs.
-pub fn build_system_prompt(style_id: &str) -> String {
+/// recent_history: 直近の変換履歴 (input, output) のスライス。空なら履歴セクションなし。
+pub fn build_system_prompt(style_id: &str, recent_history: &[(&str, &str)]) -> String {
     let style_prompt = match style_id {
         "standard" => "自然な日本語に変換してください。",
         "polite" => "丁寧語・敬語。です・ます調で統一。",
@@ -22,6 +23,19 @@ pub fn build_system_prompt(style_id: &str) -> String {
         _ => "自然な日本語に変換してください。",
     };
 
+    let history_section = if recent_history.is_empty() {
+        String::new()
+    } else {
+        let entries: Vec<String> = recent_history
+            .iter()
+            .map(|(input, output)| format!("- 「{}」→「{}」", input, output))
+            .collect();
+        format!(
+            "\n直近の変換文脈（参考にして一貫性を保ってください）：\n{}\n",
+            entries.join("\n")
+        )
+    };
+
     format!(
         r#"あなたはローマ字入力を変換するエンジンです。
 
@@ -36,10 +50,11 @@ pub fn build_system_prompt(style_id: &str) -> String {
 - 必ずJSONのみ返してください。説明・マークダウン・バッククォートは一切不要です
 
 スタイル指示：{style_prompt}
-
+{history_section}
 出力形式（JSONのみ）：
 {{"converted":"変換結果","intent":"この入力の意図を10文字程度で","typo":"タイポ修正内容。なければ空文字"}}"#,
-        style_prompt = style_prompt
+        style_prompt = style_prompt,
+        history_section = history_section,
     )
 }
 
@@ -51,14 +66,29 @@ mod tests {
     fn test_all_eight_styles_defined() {
         let styles = ["standard", "polite", "osaka", "okama", "bushi", "gal", "business", "prompt"];
         for style in &styles {
-            let prompt = build_system_prompt(style);
+            let prompt = build_system_prompt(style, &[]);
             assert!(prompt.contains("converted"), "style '{}' missing 'converted' in prompt", style);
         }
     }
 
     #[test]
     fn test_unknown_style_fallback() {
-        let prompt = build_system_prompt("nonexistent");
+        let prompt = build_system_prompt("nonexistent", &[]);
         assert!(prompt.contains("自然な日本語に変換してください。"));
+    }
+
+    #[test]
+    fn test_with_recent_history() {
+        let history = [("kaigi no jikan", "会議の時間"), ("sugu modoru", "すぐ戻る")];
+        let prompt = build_system_prompt("standard", &history);
+        assert!(prompt.contains("直近の変換文脈（参考にして一貫性を保ってください）："));
+        assert!(prompt.contains("「kaigi no jikan」→「会議の時間」"));
+        assert!(prompt.contains("「sugu modoru」→「すぐ戻る」"));
+    }
+
+    #[test]
+    fn test_empty_history_no_section() {
+        let prompt = build_system_prompt("standard", &[]);
+        assert!(!prompt.contains("直近の変換文脈"));
     }
 }

@@ -97,3 +97,20 @@ pub async fn get_history_limit(
     })
     .await.map_err(|e| e.to_string())?.map_err(|e| e.to_string())
 }
+
+/// ストッパーレコードを挿入して会話コンテキストをリセットする。
+/// 次の変換ではこのストッパー以前の履歴がプロンプトに含まれなくなる。
+#[tauri::command]
+pub async fn new_conversation(
+    state: tauri::State<'_, crate::state::AppState>,
+) -> Result<(), String> {
+    let db = state.db.clone();
+    tokio::task::spawn_blocking(move || {
+        let conn = db.blocking_lock();
+        crate::db::conversions::insert_stopper(&conn)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+    .map_err(|e| e.to_string())?;
+    Ok(())
+}

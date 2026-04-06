@@ -82,3 +82,7 @@ CREATE TRIGGER conversions_au AFTER UPDATE ON conversions BEGIN
 END;
 COMMIT;
 ";
+
+pub const MIGRATION_003: &str = "
+ALTER TABLE conversions ADD COLUMN is_stopper INTEGER NOT NULL DEFAULT 0;
+";

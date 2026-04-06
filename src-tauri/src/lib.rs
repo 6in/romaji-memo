@@ -51,6 +51,7 @@ pub fn run() {
             commands::history::delete_history,
             commands::history::set_history_limit,
             commands::history::get_history_limit,
+            commands::history::new_conversation,
             commands::providers::list_providers,
             commands::providers::get_provider_config,
             commands::providers::upsert_provider,
