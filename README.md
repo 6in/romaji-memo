@@ -91,13 +91,14 @@ The built application binary will be in `src-tauri/target/release/bundle/`.
 ## Usage
 
 1. **Type romaji** in the input area — spaces are optional; the AI infers word boundaries
-2. **Select a conversion style** from the dropdown (8 presets available)
+2. **Select a conversion style** from the dropdown (8 presets + custom styles available)
 3. **Click "変換"** or press **Cmd/Ctrl+Enter** to convert
 4. **View the result** — intent annotation ("意図:") and typo corrections ("修正:") appear below
-5. **Click the copy icon** to copy the result to clipboard
+5. **Click the copy icon** to copy the result to clipboard (auto-copied on conversion)
 6. **Toggle always-on-top** with the pin icon in the title bar
 7. **Toggle dark/light theme** with the sun/moon icon in the title bar
 8. **Open history** with the drawer button at the bottom of the window
+9. **Start a new conversation** with the "新しい会話" button in the title bar — clears context and document mode content
 
 ### Conversion Styles
 
@@ -112,11 +113,40 @@ The built application binary will be in `src-tauri/target/release/bundle/`.
 | ビジネス | Business formal Japanese |
 | AIプロンプト | AI prompt style (English) |
 
+Custom styles can be created and managed in **Settings → Style Manager**.
+
 ### History
 
 - The bottom drawer shows past conversions with style, preview, and timestamp
 - Click any history item to reload its romaji input into the text area
 - History persists across app restarts (stored in SQLite)
+- Recent history is included in the AI prompt for context-aware conversions
+- Use "新しい会話" to insert a stopper and reset the conversation context
+
+### Document Mode (長文モード)
+
+For writing long documents paragraph by paragraph:
+
+1. Click the document icon in the title bar to switch to Document Mode
+2. Type romaji and convert — each conversion is appended as a new paragraph
+3. Scroll is automatic — the view follows each new paragraph added
+4. Click **プレビュー** to view and copy the full accumulated text
+5. Use **エクスポート** to save as `.md` or `.txt`
+6. Click "新しい会話" to clear all accumulated paragraphs and start fresh
+
+### Draft Buffer
+
+- Save any conversion result to the Draft Buffer for later use
+- Reorder, delete, or copy all buffered items at once
+- Access via the buffer icon in the title bar
+
+### Settings
+
+Open via the gear icon in the title bar:
+
+- **Providers** — configure AI providers (Anthropic, OpenAI, Ollama, LM Studio), set API keys, and select the active provider
+- **History** — manage conversion history retention settings
+- **Style Manager** — create, edit, and delete custom conversion styles
 
 ## Provider Configuration
 
