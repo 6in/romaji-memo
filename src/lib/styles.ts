@@ -12,7 +12,7 @@ export const BUILT_IN_STYLES: StylePreset[] = [
   { id: 'bushi', label: '武士', emoji: '⚔️' },
   { id: 'gal', label: 'ギャル', emoji: '✌️' },
   { id: 'business', label: 'ビジネス', emoji: '💼' },
-  { id: 'prompt', label: 'AIプロンプト', emoji: '🤖' },
+  { id: 'prompt', label: '英語', emoji: '🇺🇸' },
 ];
 
 /** ビルトインスタイルか判定 */
