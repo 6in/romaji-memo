@@ -152,6 +152,14 @@ Use these entry points:
 - `/gsd:execute-phase` for planned phase work
 
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+
+## Git Branch Strategy
+
+GSD作業を開始する前に、必ずfeatureブランチを作成すること。
+
+- ブランチ名の形式: `feature/<フェーズ番号>-<簡潔な説明>` (例: `feature/04-history-stopper`)
+- `main` ブランチへの直接コミットは禁止
+- 作業完了後は `/gsd:ship` でPRを作成してmainにマージする
 <!-- GSD:workflow-end -->
 
 
