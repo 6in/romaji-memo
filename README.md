@@ -2,190 +2,190 @@
 
 ローマ字入力をAIで日本語・英語・各種スタイルに変換するデスクトップアプリ。常に最前面に表示されるフローティングツールとして動作し、チャット・ドキュメント執筆・コードコメントなど幅広い場面で使える。
 
-**Core Value:** ローマ字をタイプするだけで、スペースなし連続入力でも文脈からAIが正しく日本語・英語に変換し、ワンクリックでコピーできること。
+**コアバリュー:** ローマ字をタイプするだけで、スペースなし連続入力でも文脈からAIが正しく日本語・英語に変換し、ワンクリックでコピーできること。
 
-## Prerequisites
+## 必要環境
 
 - Node.js 18+
-- Rust (install via [rustup](https://rustup.rs))
-- macOS 12+ or Windows 10+
+- Rust（[rustup](https://rustup.rs) 経由でインストール）
+- macOS 12+ または Windows 10+
 
-## Setup
+## セットアップ
 
-### 1. Register an API Key in OS Keychain
+### 1. APIキーをOSキーチェーンに登録
 
-API keys are stored in the OS Keychain only — never in config files or localStorage.
+APIキーはOSキーチェーンにのみ保存されます。設定ファイルやlocalStorageには保存しません。
 
-The app uses `Entry::new("romaji-memo", provider_id)` internally (keyring crate v3.6.3), where:
-- service = `romaji-memo` (fixed)
-- account = provider_id (e.g., `anthropic`, `openai`)
+アプリ内部では `Entry::new("romaji-memo", provider_id)`（keyring crate v3.6.3）を使用します。
+- service = `romaji-memo`（固定）
+- account = provider_id（例: `anthropic`, `openai`）
 
-**macOS — Register API key in Keychain:**
+**macOS — キーチェーンにAPIキーを登録:**
 
 ```bash
-# Anthropic (Claude) — recommended default provider
+# Anthropic (Claude) — デフォルト推奨プロバイダー
 security add-generic-password -s "romaji-memo" -a "anthropic" -w "sk-ant-YOUR_KEY_HERE"
 
-# OpenAI (optional)
+# OpenAI（任意）
 security add-generic-password -s "romaji-memo" -a "openai" -w "sk-YOUR_KEY_HERE"
 ```
 
-To update an existing key, delete the old entry first:
+既存のキーを更新する場合は先に削除してから再登録:
 
 ```bash
 security delete-generic-password -s "romaji-memo" -a "anthropic"
 security add-generic-password -s "romaji-memo" -a "anthropic" -w "sk-ant-YOUR_KEY_HERE"
 ```
 
-**Windows — Register API key in Credential Manager:**
+**Windows — 資格情報マネージャーに登録:**
 
 ```powershell
-# Anthropic (Claude) — recommended default provider
+# Anthropic (Claude) — デフォルト推奨プロバイダー
 cmdkey /add:romaji-memo /user:anthropic /pass:sk-ant-YOUR_KEY_HERE
 
-# OpenAI (optional)
+# OpenAI（任意）
 cmdkey /add:romaji-memo /user:openai /pass:sk-YOUR_KEY_HERE
 ```
 
-The `/add:romaji-memo` target and `/user:anthropic` username must match exactly what
-`Entry::new("romaji-memo", "anthropic")` produces. The keyring crate v3.6.3 stores
-credentials as a Windows Credential Manager "Generic Credential" type.
+`/add:romaji-memo` と `/user:anthropic` は `Entry::new("romaji-memo", "anthropic")` が生成する値と完全に一致している必要があります。keyring crate v3.6.3 は Windows 資格情報マネージャーの「汎用資格情報」タイプとして保存します。
 
-If credentials are not found at runtime, verify in Credential Manager
-(Control Panel > User Accounts > Credential Manager > Windows Credentials) that a
-Generic Credential entry exists with target `romaji-memo` and username `anthropic`.
+実行時に資格情報が見つからない場合は、資格情報マネージャー（コントロールパネル → ユーザーアカウント → 資格情報マネージャー → Windows 資格情報）で、ターゲット `romaji-memo`・ユーザー名 `anthropic` の汎用資格情報が存在するか確認してください。
 
-To update an existing key on Windows:
+Windowsで既存のキーを更新する場合:
 
 ```powershell
 cmdkey /delete:romaji-memo
 cmdkey /add:romaji-memo /user:anthropic /pass:sk-ant-YOUR_KEY_HERE
 ```
 
-### 2. Ollama (Local — no API key needed)
+### 2. Ollama（ローカル — APIキー不要）
 
-For fully offline operation, use Ollama:
+完全オフラインで使用する場合は Ollama を利用できます:
 
-1. Install Ollama from https://ollama.ai
-2. Pull a model: `ollama pull gemma3:12b`
-3. Ollama must be running on `localhost:11434` before launching the app
+1. https://ollama.ai から Ollama をインストール
+2. モデルを取得: `ollama pull gemma3:12b`
+3. アプリ起動前に Ollama が `localhost:11434` で動作していること
 
-No API key registration is required for Ollama. Set the default provider to `ollama-local`
-in `providers.json`.
+Ollama の場合、APIキー登録は不要です。`providers.json` でデフォルトプロバイダーを `ollama-local` に設定してください。
 
-## Development
+## 開発
 
 ```bash
 npm install
 npx tauri dev
 ```
 
-## Build
+## ビルド
 
 ```bash
 npx tauri build
 ```
 
-The built application binary will be in `src-tauri/target/release/bundle/`.
+ビルドされたアプリは `src-tauri/target/release/bundle/` に出力されます。
 
-## Usage
+> **macOS での配布について:** 未署名のアプリは「壊れている」と表示される場合があります。受け取り側で以下を実行してください:
+> ```bash
+> xattr -cr /Applications/RomajiMemo.app
+> ```
 
-1. **Type romaji** in the input area — spaces are optional; the AI infers word boundaries
-2. **Select a conversion style** from the dropdown (8 presets + custom styles available)
-3. **Click "変換"** or press **Cmd/Ctrl+Enter** to convert
-4. **View the result** — intent annotation ("意図:") and typo corrections ("修正:") appear below
-5. **Click the copy icon** to copy the result to clipboard (auto-copied on conversion)
-6. **Toggle always-on-top** with the pin icon in the title bar
-7. **Toggle dark/light theme** with the sun/moon icon in the title bar
-8. **Open history** with the drawer button at the bottom of the window
-9. **Start a new conversation** with the "新しい会話" button in the title bar — clears context and document mode content
+## 使い方
 
-### Conversion Styles
+1. **ローマ字を入力** — スペース不要、AIが文脈から単語境界を判断
+2. **変換スタイルを選択** — ドロップダウンから選択（8種のプリセット＋カスタムスタイル）
+3. **「変換」をクリック** または **Cmd/Ctrl+Enter** で変換
+4. **結果を確認** — 意図（"意図:"）と誤字修正（"修正:"）が結果の下に表示
+5. **コピーアイコンをクリック** してクリップボードにコピー（変換時に自動コピーも可）
+6. **ピンアイコン** でウィンドウの最前面固定を切り替え
+7. **太陽/月アイコン** でダーク/ライトテーマを切り替え
+8. **ウィンドウ下部のドロワーボタン** で変換履歴を開く
+9. **「新しい会話」ボタン**（タイトルバー）でコンテキストと長文モードの内容をリセット
 
-| Style | Description |
-|-------|-------------|
-| 標準 | Standard Japanese |
-| 丁寧 | Polite Japanese |
-| 大阪弁 | Osaka dialect |
-| おかま | Feminine speech style |
-| 武士 | Samurai speech style |
-| ギャル | Gyaru speech style |
-| ビジネス | Business formal Japanese |
-| AIプロンプト | AI prompt style (English) |
+### 変換スタイル
 
-Custom styles can be created and managed in **Settings → Style Manager**.
+| スタイル | 説明 |
+|----------|------|
+| 標準 | 標準的な日本語 |
+| 丁寧 | 丁寧な日本語 |
+| 大阪弁 | 大阪方言 |
+| おかま | 女性的な話し方 |
+| 武士 | 武士口調 |
+| ギャル | ギャル語 |
+| ビジネス | ビジネス敬語 |
+| AIプロンプト | AIプロンプト向け英語 |
 
-### History
+カスタムスタイルは **設定 → スタイルマネージャー** で作成・管理できます。
 
-- The bottom drawer shows past conversions with style, preview, and timestamp
-- Click any history item to reload its romaji input into the text area
-- History persists across app restarts (stored in SQLite)
-- Recent history is included in the AI prompt for context-aware conversions
-- Use "新しい会話" to insert a stopper and reset the conversation context
+### 変換履歴
 
-### Document Mode (長文モード)
+- ウィンドウ下部のドロワーに過去の変換がスタイル・プレビュー・タイムスタンプ付きで表示
+- 履歴アイテムをクリックするとそのローマ字入力が再ロードされる
+- 履歴はアプリ再起動後も保持（SQLiteに保存）
+- 直近の履歴はAIプロンプトに含まれ、文脈を考慮した変換が可能
+- 「新しい会話」でストッパーを挿入してAIの会話コンテキストをリセット
 
-For writing long documents paragraph by paragraph:
+### 長文モード（Document Mode）
 
-1. Click the document icon in the title bar to switch to Document Mode
-2. Type romaji and convert — each conversion is appended as a new paragraph
-3. Scroll is automatic — the view follows each new paragraph added
-4. Click **プレビュー** to view and copy the full accumulated text
-5. Use **エクスポート** to save as `.md` or `.txt`
-6. Click "新しい会話" to clear all accumulated paragraphs and start fresh
+段落ごとに長文を書く場合に使用します:
 
-### Draft Buffer
+1. タイトルバーのドキュメントアイコンで長文モードに切り替え
+2. ローマ字を入力して変換 — 変換のたびに段落として追記される
+3. 段落追加時は自動スクロールで最新内容が表示される
+4. **プレビュー** ボタンで全文を表示・コピー
+5. **エクスポート** で `.md` または `.txt` として保存
+6. 「新しい会話」で蓄積した段落をすべてクリアして最初からやり直し
 
-- Save any conversion result to the Draft Buffer for later use
-- Reorder, delete, or copy all buffered items at once
-- Access via the buffer icon in the title bar
+### ドラフトバッファ
 
-### Settings
+- 変換結果をドラフトバッファに保存して後から使える
+- 保存したアイテムの並び替え・削除・一括コピーが可能
+- タイトルバーのバッファアイコンからアクセス
 
-Open via the gear icon in the title bar:
+### 設定
 
-- **Providers** — configure AI providers (Anthropic, OpenAI, Ollama, LM Studio), set API keys, and select the active provider
-- **History** — manage conversion history retention settings
-- **Style Manager** — create, edit, and delete custom conversion styles
+タイトルバーのギアアイコンから開きます:
 
-## Provider Configuration
+- **プロバイダー** — AIプロバイダー（Anthropic・OpenAI・Ollama・LM Studio）の設定、APIキー登録、アクティブプロバイダーの選択
+- **履歴** — 変換履歴の保持設定
+- **スタイルマネージャー** — カスタム変換スタイルの作成・編集・削除
 
-The app ships with a `providers.json` in the app data directory:
+## プロバイダー設定
 
-- **Default provider:** Anthropic (Claude Haiku)
-- **Ollama (local):** Pre-configured at `http://localhost:11434/v1`
-- **OpenAI:** Disabled by default; enable by setting `"enabled": true`
+アプリはデータディレクトリに `providers.json` を持ちます:
 
-To modify providers, edit `providers.json` in the Tauri app data directory:
+- **デフォルトプロバイダー:** Anthropic（Claude Haiku）
+- **Ollama（ローカル）:** `http://localhost:11434/v1` で事前設定済み
+- **OpenAI:** デフォルト無効。`"enabled": true` に変更することで有効化
+
+`providers.json` の場所:
 - macOS: `~/Library/Application Support/romaji-memo/providers.json`
 - Windows: `%APPDATA%\romaji-memo\providers.json`
 
-API keys are stored in OS Keychain only — never in `providers.json` or any config file.
+APIキーは `providers.json` や設定ファイルには保存されません。OSキーチェーンにのみ保存されます。
 
-## Tech Stack
+## 技術スタック
 
-| Layer | Technology |
-|-------|------------|
-| Desktop shell | Tauri 2.10.3 |
-| Frontend | React 19 + TypeScript 5 |
-| Bundler | Vite 6 |
-| Styling | Tailwind CSS v4 + shadcn/ui |
-| State | Zustand 5 + TanStack Query 5 |
-| Icons | Lucide React |
-| Backend runtime | Rust (stable 1.77.2+) |
-| Database | SQLite via rusqlite 0.39.0 (bundled, FTS5) |
-| Keychain | keyring 3.6.3 (OS Keychain / Credential Manager) |
-| HTTP | reqwest 0.13 (rustls-tls) |
+| レイヤー | 技術 |
+|----------|------|
+| デスクトップシェル | Tauri 2.10.3 |
+| フロントエンド | React 19 + TypeScript 5 |
+| バンドラー | Vite 6 |
+| スタイリング | Tailwind CSS v4 + shadcn/ui |
+| 状態管理 | Zustand 5 + TanStack Query 5 |
+| アイコン | Lucide React |
+| バックエンド | Rust（stable 1.77.2+） |
+| データベース | SQLite（rusqlite 0.39.0 bundled、FTS5） |
+| キーチェーン | keyring 3.6.3（OS Keychain / Credential Manager） |
+| HTTP | reqwest 0.13（rustls-tls） |
 
-## Security Notes
+## セキュリティ
 
-- API keys are stored exclusively in OS Keychain (macOS Security framework / Windows Credential Manager)
-- No API keys are written to disk, config files, or localStorage
-- All AI HTTP calls are made from the Rust backend — keys never reach the frontend
-- The `providers.json` file shows `"<encrypted>"` as a placeholder for key fields
+- APIキーはOSキーチェーン（macOS Security framework / Windows Credential Manager）にのみ保存
+- APIキーはディスク・設定ファイル・localStorageに書き込まれない
+- AI向けのHTTP呼び出しはすべてRustバックエンドで実行 — キーがフロントエンドに渡ることはない
+- `providers.json` のキーフィールドにはプレースホルダー `"<encrypted>"` が表示される
 
-## Performance Targets
+## パフォーマンス目標
 
-- Launch time: under 3 seconds (cold start)
-- Memory usage: under 200MB total (Tauri main process + WebView)
-- Platform: macOS 12+ and Windows 10+
+- 起動時間: 3秒以内（コールドスタート）
+- メモリ使用量: 200MB以下（Tauriメインプロセス + WebView 合計）
+- 対応プラットフォーム: macOS 12+ / Windows 10+
